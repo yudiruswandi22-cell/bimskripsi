@@ -691,6 +691,72 @@
                 </form>
             </div>
 
+            <!-- Panel Manajemen Status Skripsi -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">📊 Manajemen Status Skripsi</h3>
+                <div class="mb-4 p-4 bg-blue-50 border-l-4 border-blue-400 rounded">
+                    <p class="text-sm text-blue-800">
+                        <strong>Petunjuk:</strong> Panel ini digunakan untuk mengubah status skripsi mahasiswa menjadi "Selesai" atau "Dalam Proses" 
+                        yang akan mempengaruhi statistik di Dashboard.
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Update Status Individual -->
+                    <div>
+                        <h4 class="font-semibold text-gray-700 mb-3">Update Status Individual</h4>
+                        <form class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Pilih Mahasiswa</label>
+                                <select id="statusMahasiswaSelect" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">Pilih Mahasiswa</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Status Skripsi</label>
+                                <select id="statusSkripsiSelect" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="">Pilih Status</option>
+                                    <option value="Dalam Proses">Dalam Proses</option>
+                                    <option value="Selesai">Selesai</option>
+                                    <option value="Belum Mulai">Belum Mulai</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Catatan (Opsional)</label>
+                                <textarea id="statusCatatan" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-20" placeholder="Catatan tambahan..."></textarea>
+                            </div>
+                            <button type="button" onclick="updateStatusSkripsi()" class="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors">Update Status</button>
+                        </form>
+                    </div>
+                    
+                    <!-- Rekapitulasi Status -->
+                    <div>
+                        <h4 class="font-semibold text-gray-700 mb-3">Rekapitulasi Status Skripsi</h4>
+                        <div class="space-y-3 max-h-80 overflow-y-auto">
+                            <div id="rekapStatusSkripsi" class="space-y-2">
+                                <!-- Status akan muncul di sini -->
+                            </div>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-gray-200">
+                            <div class="grid grid-cols-3 gap-4 text-center">
+                                <div class="p-3 bg-green-50 rounded-lg">
+                                    <div class="text-lg font-bold text-green-600" id="countSelesai">0</div>
+                                    <div class="text-xs text-green-600">Selesai</div>
+                                </div>
+                                <div class="p-3 bg-yellow-50 rounded-lg">
+                                    <div class="text-lg font-bold text-yellow-600" id="countProses">0</div>
+                                    <div class="text-xs text-yellow-600">Dalam Proses</div>
+                                </div>
+                                <div class="p-3 bg-gray-50 rounded-lg">
+                                    <div class="text-lg font-bold text-gray-600" id="countBelum">0</div>
+                                    <div class="text-xs text-gray-600">Belum Mulai</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Rekapitulasi Jadwal Munaqosyah -->
             <div class="bg-white rounded-xl shadow-lg p-6">
                 <h3 class="text-xl font-semibold text-gray-800 mb-4">📋 Rekapitulasi Jadwal Sidang Munaqosyah</h3>
@@ -1198,8 +1264,10 @@
         // Update dashboard statistics
         function updateDashboardStats() {
             dashboardStats.totalMahasiswa = accounts.mahasiswa.filter(m => m.status === 'aktif').length;
-            dashboardStats.skripsiSelesai = submissions.munaqosyah.filter(m => m.status === 'Selesai').length;
-            dashboardStats.dalamProses = submissions.judulSkripsi.filter(j => j.status === 'Disetujui').length;
+            
+            // Calculate based on status skripsi data
+            dashboardStats.skripsiSelesai = submissions.statusSkripsi.filter(s => s.status === 'Selesai').length;
+            dashboardStats.dalamProses = submissions.statusSkripsi.filter(s => s.status === 'Dalam Proses').length;
             
             // Update dashboard display
             const totalMahasiswaEl = document.querySelector('.text-2xl.font-bold.text-blue-600');
@@ -1224,6 +1292,8 @@
             updateDropdownOptions();
             updateRiwayatBimbingan();
             updatePersetujuanDosenTable();
+            updateRekapStatusSkripsi();
+            updateStatusDropdownOptions();
         }
         
         function updateJudulTable(snapshot) {
@@ -1729,6 +1799,7 @@
             jadwalMunaqosyah: [],
             munaqosyah: [],
             pembimbing: [],
+            statusSkripsi: [], // New: untuk menyimpan status skripsi mahasiswa
             notifikasi: {
                 mahasiswa: {},
                 dosen: {},
@@ -1743,7 +1814,64 @@
             dalamProses: 0
         };
 
-        // Login functionality
+        // Session management with unique session ID
+        function generateSessionId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function createSession(type, identifier, userData) {
+            const sessionId = generateSessionId();
+            const sessionData = {
+                sessionId: sessionId,
+                type: type,
+                identifier: identifier,
+                userData: userData,
+                timestamp: Date.now(),
+                tabId: generateSessionId() // Unique for each tab
+            };
+            
+            // Store in sessionStorage (tab-specific)
+            sessionStorage.setItem(`${type}Login`, identifier);
+            sessionStorage.setItem(`${type}Session`, JSON.stringify(sessionData));
+            
+            return sessionId;
+        }
+
+        function validateSession(type) {
+            const loginData = sessionStorage.getItem(`${type}Login`);
+            const sessionData = sessionStorage.getItem(`${type}Session`);
+            
+            if (!loginData || !sessionData) {
+                return false;
+            }
+            
+            try {
+                const session = JSON.parse(sessionData);
+                // Session expires after 8 hours of inactivity
+                const maxAge = 8 * 60 * 60 * 1000; // 8 hours in milliseconds
+                
+                if (Date.now() - session.timestamp > maxAge) {
+                    clearSession(type);
+                    return false;
+                }
+                
+                // Update timestamp for activity
+                session.timestamp = Date.now();
+                sessionStorage.setItem(`${type}Session`, JSON.stringify(session));
+                
+                return true;
+            } catch (error) {
+                clearSession(type);
+                return false;
+            }
+        }
+
+        function clearSession(type) {
+            sessionStorage.removeItem(`${type}Login`);
+            sessionStorage.removeItem(`${type}Session`);
+        }
+
+        // Login functionality with session management
         function loginMahasiswa() {
             const nim = document.getElementById('nimLogin').value;
             
@@ -1759,13 +1887,13 @@
                 return;
             }
             
+            // Create new session
+            createSession('mahasiswa', nim, mahasiswa);
+            
             // Hide login form and show portal
             document.getElementById('loginMahasiswa').classList.add('hidden');
             document.getElementById('portalMahasiswa').classList.remove('hidden');
             document.getElementById('welcomeMahasiswa').textContent = `Selamat datang, ${mahasiswa.nama}`;
-            
-            // Store login status
-            sessionStorage.setItem('mahasiswaLogin', nim);
             
             // Update notifications and rekapitulasi
             updateMahasiswaNotifications();
@@ -1773,10 +1901,10 @@
         }
         
         function logoutMahasiswa() {
+            clearSession('mahasiswa');
             document.getElementById('loginMahasiswa').classList.remove('hidden');
             document.getElementById('portalMahasiswa').classList.add('hidden');
             document.getElementById('nimLogin').value = '';
-            sessionStorage.removeItem('mahasiswaLogin');
         }
         
         function loginProdi() {
@@ -1791,10 +1919,12 @@
             // Check credentials
             const prodi = accounts.prodi.find(p => p.username === username && p.password === password && p.status === 'aktif');
             if (prodi) {
+                // Create new session
+                createSession('prodi', username, prodi);
+                
                 document.getElementById('loginProdi').classList.add('hidden');
                 document.getElementById('portalProdi').classList.remove('hidden');
                 document.getElementById('welcomeProdi').textContent = `Selamat datang, ${prodi.nama}`;
-                sessionStorage.setItem('prodiLogin', username);
                 
                 // Update tables and notifications
                 updateJudulValidasiTable();
@@ -1807,11 +1937,11 @@
         }
         
         function logoutProdi() {
+            clearSession('prodi');
             document.getElementById('loginProdi').classList.remove('hidden');
             document.getElementById('portalProdi').classList.add('hidden');
             document.getElementById('usernameProdi').value = '';
             document.getElementById('passwordProdi').value = '';
-            sessionStorage.removeItem('prodiLogin');
         }
         
         function loginDosen() {
@@ -1826,10 +1956,12 @@
             // Check credentials
             const dosen = accounts.dosen.find(d => d.username === username && d.password === password && d.status === 'aktif');
             if (dosen) {
+                // Create new session
+                createSession('dosen', username, dosen);
+                
                 document.getElementById('loginDosen').classList.add('hidden');
                 document.getElementById('portalDosen').classList.remove('hidden');
                 document.getElementById('welcomeDosen').textContent = `Selamat datang, ${dosen.nama}`;
-                sessionStorage.setItem('dosenLogin', username);
                 
                 // Update notifications and tables
                 updateDosenNotifications();
@@ -1841,11 +1973,11 @@
         }
         
         function logoutDosen() {
+            clearSession('dosen');
             document.getElementById('loginDosen').classList.remove('hidden');
             document.getElementById('portalDosen').classList.add('hidden');
             document.getElementById('usernameDosen').value = '';
             document.getElementById('passwordDosen').value = '';
-            sessionStorage.removeItem('dosenLogin');
         }
 
         // Manajemen login functions
@@ -1860,10 +1992,12 @@
             
             // Demo admin credentials
             if (username === 'admin' && password === 'admin123') {
+                // Create new session
+                createSession('manajemen', username, { username: username, nama: 'Administrator' });
+                
                 document.getElementById('loginManajemen').classList.add('hidden');
                 document.getElementById('portalManajemen').classList.remove('hidden');
                 document.getElementById('welcomeManajemen').textContent = `Selamat datang, Administrator`;
-                sessionStorage.setItem('manajemenLogin', username);
                 showManajemenTab('mahasiswa');
             } else {
                 alert('Username atau password salah! (Demo: admin/admin123)');
@@ -1871,11 +2005,11 @@
         }
         
         function logoutManajemen() {
+            clearSession('manajemen');
             document.getElementById('loginManajemen').classList.remove('hidden');
             document.getElementById('portalManajemen').classList.add('hidden');
             document.getElementById('usernameManajemen').value = '';
             document.getElementById('passwordManajemen').value = '';
-            sessionStorage.removeItem('manajemenLogin');
         }
 
         // Tab management for manajemen
@@ -2235,10 +2369,10 @@
             // Show selected page
             document.getElementById(pageId).classList.remove('hidden');
             
-            // Check login status when switching pages
+            // Check login status when switching pages with session validation
             if (pageId === 'mahasiswa') {
-                const mahasiswaLogin = sessionStorage.getItem('mahasiswaLogin');
-                if (mahasiswaLogin) {
+                if (validateSession('mahasiswa')) {
+                    const mahasiswaLogin = sessionStorage.getItem('mahasiswaLogin');
                     const mahasiswa = accounts.mahasiswa.find(m => m.nim === mahasiswaLogin);
                     if (mahasiswa) {
                         document.getElementById('loginMahasiswa').classList.add('hidden');
@@ -2254,8 +2388,8 @@
                     document.getElementById('portalMahasiswa').classList.add('hidden');
                 }
             } else if (pageId === 'prodi') {
-                const prodiLogin = sessionStorage.getItem('prodiLogin');
-                if (prodiLogin) {
+                if (validateSession('prodi')) {
+                    const prodiLogin = sessionStorage.getItem('prodiLogin');
                     const prodi = accounts.prodi.find(p => p.username === prodiLogin);
                     if (prodi) {
                         document.getElementById('loginProdi').classList.add('hidden');
@@ -2271,8 +2405,8 @@
                     document.getElementById('portalProdi').classList.add('hidden');
                 }
             } else if (pageId === 'dosen') {
-                const dosenLogin = sessionStorage.getItem('dosenLogin');
-                if (dosenLogin) {
+                if (validateSession('dosen')) {
+                    const dosenLogin = sessionStorage.getItem('dosenLogin');
                     const dosen = accounts.dosen.find(d => d.username === dosenLogin);
                     if (dosen) {
                         document.getElementById('loginDosen').classList.add('hidden');
@@ -2289,8 +2423,7 @@
                     document.getElementById('portalDosen').classList.add('hidden');
                 }
             } else if (pageId === 'manajemen') {
-                const manajemenLogin = sessionStorage.getItem('manajemenLogin');
-                if (manajemenLogin) {
+                if (validateSession('manajemen')) {
                     document.getElementById('loginManajemen').classList.add('hidden');
                     document.getElementById('portalManajemen').classList.remove('hidden');
                     document.getElementById('welcomeManajemen').textContent = `Selamat datang, Administrator`;
@@ -4270,6 +4403,153 @@
             };
         }
 
+        // Status Skripsi Management Functions
+        async function updateStatusSkripsi() {
+            // Prevent default form submission
+            if (event && event.preventDefault) {
+                event.preventDefault();
+            }
+            
+            const mahasiswaSelect = document.getElementById('statusMahasiswaSelect').value;
+            const status = document.getElementById('statusSkripsiSelect').value;
+            const catatan = document.getElementById('statusCatatan').value;
+            
+            if (!mahasiswaSelect || !status) {
+                alert('Mohon pilih mahasiswa dan status skripsi!');
+                return;
+            }
+            
+            // Extract NIM from mahasiswa string (format: "Nama (NIM)")
+            const nimMatch = mahasiswaSelect.match(/\((\d+)\)/);
+            const nim = nimMatch ? nimMatch[1] : '';
+            const nama = mahasiswaSelect.split(' (')[0];
+            
+            if (!nim) {
+                alert('Format mahasiswa tidak valid!');
+                return;
+            }
+            
+            // Check if status already exists for this mahasiswa
+            const existingIndex = submissions.statusSkripsi.findIndex(s => s.nim === nim);
+            
+            const statusData = {
+                id: existingIndex >= 0 ? submissions.statusSkripsi[existingIndex].id : Date.now().toString(),
+                nim: nim,
+                nama: nama,
+                status: status,
+                catatan: catatan,
+                tanggalUpdate: new Date().toLocaleDateString('id-ID'),
+                timestamp: new Date()
+            };
+            
+            if (existingIndex >= 0) {
+                // Update existing status
+                submissions.statusSkripsi[existingIndex] = statusData;
+            } else {
+                // Add new status
+                submissions.statusSkripsi.push(statusData);
+            }
+            
+            try {
+                // Save to Firebase
+                if (existingIndex >= 0) {
+                    await updateDoc(doc(db, 'status_skripsi', statusData.id), statusData);
+                } else {
+                    await addDoc(collection(db, 'status_skripsi'), statusData);
+                }
+            } catch (error) {
+                console.log('Demo mode - status saved locally');
+                saveLocalData();
+            }
+            
+            alert(`Status skripsi ${nama} berhasil diupdate menjadi "${status}"!`);
+            
+            // Clear form
+            document.getElementById('statusMahasiswaSelect').value = '';
+            document.getElementById('statusSkripsiSelect').value = '';
+            document.getElementById('statusCatatan').value = '';
+            
+            // Update displays
+            updateRekapStatusSkripsi();
+            updateDashboardStats();
+        }
+        
+        function updateRekapStatusSkripsi() {
+            const container = document.getElementById('rekapStatusSkripsi');
+            const countSelesai = document.getElementById('countSelesai');
+            const countProses = document.getElementById('countProses');
+            const countBelum = document.getElementById('countBelum');
+            
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            // Count status
+            let selesai = 0, proses = 0, belum = 0;
+            
+            if (submissions.statusSkripsi.length > 0) {
+                submissions.statusSkripsi.forEach(status => {
+                    const div = document.createElement('div');
+                    let statusClass = 'bg-gray-100 text-gray-800';
+                    let statusIcon = '⏳';
+                    
+                    if (status.status === 'Selesai') {
+                        statusClass = 'bg-green-100 text-green-800';
+                        statusIcon = '✅';
+                        selesai++;
+                    } else if (status.status === 'Dalam Proses') {
+                        statusClass = 'bg-yellow-100 text-yellow-800';
+                        statusIcon = '🔄';
+                        proses++;
+                    } else {
+                        statusIcon = '⏸️';
+                        belum++;
+                    }
+                    
+                    div.className = 'p-3 border border-gray-200 rounded-lg';
+                    div.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="font-medium text-sm">${status.nama} (${status.nim})</div>
+                                <div class="text-xs text-gray-500 mt-1">Update: ${status.tanggalUpdate}</div>
+                                ${status.catatan ? `<div class="text-xs text-gray-600 mt-1 italic">"${status.catatan}"</div>` : ''}
+                            </div>
+                            <span class="px-2 py-1 ${statusClass} rounded-full text-xs font-medium ml-2">
+                                ${statusIcon} ${status.status}
+                            </span>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+            } else {
+                container.innerHTML = '<div class="p-3 text-center text-gray-500 text-sm">Belum ada data status skripsi</div>';
+            }
+            
+            // Update counters
+            if (countSelesai) countSelesai.textContent = selesai;
+            if (countProses) countProses.textContent = proses;
+            if (countBelum) countBelum.textContent = belum;
+        }
+        
+        function updateStatusDropdownOptions() {
+            const statusMahasiswaSelect = document.getElementById('statusMahasiswaSelect');
+            if (!statusMahasiswaSelect) return;
+            
+            const currentValue = statusMahasiswaSelect.value;
+            statusMahasiswaSelect.innerHTML = '<option value="">Pilih Mahasiswa</option>';
+            
+            // Add all active mahasiswa
+            accounts.mahasiswa.forEach(mhs => {
+                if (mhs.status === 'aktif') {
+                    const option = document.createElement('option');
+                    option.value = `${mhs.nama} (${mhs.nim})`;
+                    option.textContent = `${mhs.nama} (${mhs.nim})`;
+                    if (option.value === currentValue) option.selected = true;
+                    statusMahasiswaSelect.appendChild(option);
+                }
+            });
+        }
+
         // Add demo data for testing
         function addDemoData() {
             // Demo accounts
@@ -4364,6 +4644,29 @@
                     }
                 ];
             }
+            
+            if (submissions.statusSkripsi.length === 0) {
+                submissions.statusSkripsi = [
+                    {
+                        id: 'status_1',
+                        nim: '2021001',
+                        nama: 'Ahmad Fauzi',
+                        status: 'Dalam Proses',
+                        catatan: 'Sedang menyelesaikan BAB III',
+                        tanggalUpdate: new Date().toLocaleDateString('id-ID'),
+                        timestamp: new Date()
+                    },
+                    {
+                        id: 'status_2',
+                        nim: '2021002',
+                        nama: 'Siti Nurhaliza',
+                        status: 'Selesai',
+                        catatan: 'Lulus dengan nilai A',
+                        tanggalUpdate: new Date().toLocaleDateString('id-ID'),
+                        timestamp: new Date()
+                    }
+                ];
+            }
         }
 
         // Initialize page
@@ -4393,5 +4696,5 @@
             loadData();
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98012da1351540ec',t:'MTc1ODAzNDI0OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98014440614897fb',t:'MTc1ODAzNTE3NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
