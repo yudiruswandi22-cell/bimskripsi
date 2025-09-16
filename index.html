@@ -8,7 +8,7 @@
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, query, orderBy, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
         
         // Firebase configuration
         const firebaseConfig = {
@@ -30,6 +30,7 @@
         window.addDoc = addDoc;
         window.getDocs = getDocs;
         window.updateDoc = updateDoc;
+        window.deleteDoc = deleteDoc;
         window.doc = doc;
         window.query = query;
         window.orderBy = orderBy;
@@ -306,10 +307,18 @@
             <!-- Rekapitulasi Pengajuan Seminar Proposal Mahasiswa -->
             <div class="bg-white rounded-xl shadow-lg p-6 mt-6">
                 <h3 class="text-xl font-semibold text-gray-800 mb-4">📋 Rekapitulasi Pengajuan Seminar Proposal</h3>
-                <div class="overflow-x-auto">
+                <div class="mb-4 flex items-center space-x-4">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="selectAllSeminarMhs" onchange="toggleSelectAllSeminarMhs()" class="mr-2">
+                        <span class="text-sm font-medium text-gray-700">Pilih Semua</span>
+                    </label>
+                    <button onclick="hapusDataTerpilih('seminarMhs')" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm">HAPUS DATA</button>
+                </div>
+                <div class="overflow-x-auto max-h-96 overflow-y-auto">
                     <table class="w-full table-auto">
                         <thead>
                             <tr class="bg-gray-50">
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Pilih</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">NIM</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Nama</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Tanggal Pengajuan</th>
@@ -347,6 +356,63 @@
                         <button type="button" onclick="submitMunaqosyah()" class="bg-purple-600 text-white py-2 px-6 rounded-lg hover:bg-purple-700 transition-colors">Ajukan Sidang Munaqosyah</button>
                     </div>
                 </form>
+            </div>
+
+            <!-- Panel Input Berkas -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mt-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">📁 Input Berkas Skripsi</h3>
+                <div class="text-center">
+                    <div class="mb-4">
+                        <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+                            <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                        </div>
+                        <h4 class="text-lg font-semibold text-gray-800 mb-2">Upload Berkas Skripsi</h4>
+                        <p class="text-gray-600 mb-6">Klik tombol di bawah untuk mengakses folder Google Drive dan upload berkas skripsi Anda</p>
+                    </div>
+                    <button onclick="openGoogleDrive()" 
+                            class="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                        </svg>
+                        Buka Folder Google Drive
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                        </svg>
+                    </button>
+                    
+                    <!-- Alternative link jika popup diblokir -->
+                    <div id="alternativeLink" class="mt-3 hidden">
+                        <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                            <p class="text-sm text-yellow-800 mb-2">
+                                <strong>Popup diblokir?</strong> Klik link di bawah ini:
+                            </p>
+                            <a href="https://drive.google.com/drive/folders/1OUW7LhUaQ20ubFQ6h8zADqGCu5CX21Lh?usp=drive_link" 
+                               target="_blank" 
+                               class="text-blue-600 hover:text-blue-800 underline text-sm font-medium">
+                                📁 https://drive.google.com/drive/folders/1OUW7LhUaQ20ubFQ6h8zADqGCu5CX21Lh
+                            </a>
+                            <p class="text-xs text-gray-600 mt-1">
+                                Atau copy-paste link di atas ke browser baru
+                            </p>
+                        </div>
+                    </div>
+                    <div class="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded text-left">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-yellow-700">
+                                    <strong>Petunjuk:</strong> Pastikan Anda sudah login dengan akun Google yang sesuai. Upload berkas dalam format PDF dengan nama file yang jelas (contoh: NIM_Nama_Skripsi.pdf).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             </div>
         </div>
@@ -394,15 +460,16 @@
             <!-- Validasi Judul -->
             <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
                 <h3 class="text-xl font-semibold text-gray-800 mb-4">✅ Validasi Judul Skripsi</h3>
-                <div class="mb-4 flex items-center space-x-4">
+                <div class="mb-4 flex items-center space-x-4 flex-wrap gap-2">
                     <label class="flex items-center">
                         <input type="checkbox" id="selectAll" onchange="toggleSelectAll()" class="mr-2">
                         <span class="text-sm font-medium text-gray-700">Pilih Semua</span>
                     </label>
                     <button onclick="validasiMassal('terima')" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm">DITERIMA</button>
                     <button onclick="validasiMassal('tolak')" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm">DITOLAK</button>
+                    <button onclick="hapusDataTerpilih('judul')" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm">HAPUS DATA</button>
                 </div>
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto max-h-96 overflow-y-auto">
                     <table class="w-full table-auto">
                         <thead>
                             <tr class="bg-gray-50">
@@ -459,10 +526,18 @@
             <!-- Rekapitulasi Pengajuan Seminar Proposal Program Studi -->
             <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
                 <h3 class="text-xl font-semibold text-gray-800 mb-4">📋 Rekapitulasi Pengajuan Seminar Proposal</h3>
-                <div class="overflow-x-auto">
+                <div class="mb-4 flex items-center space-x-4">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="selectAllSeminar" onchange="toggleSelectAllSeminar()" class="mr-2">
+                        <span class="text-sm font-medium text-gray-700">Pilih Semua</span>
+                    </label>
+                    <button onclick="hapusDataTerpilih('seminar')" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm">HAPUS DATA</button>
+                </div>
+                <div class="overflow-x-auto max-h-96 overflow-y-auto">
                     <table class="w-full table-auto">
                         <thead>
                             <tr class="bg-gray-50">
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Pilih</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">NIM</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Nama</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Tanggal Pengajuan</th>
@@ -479,10 +554,24 @@
             <!-- Rekapitulasi Jadwal Seminar -->
             <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
                 <h3 class="text-xl font-semibold text-gray-800 mb-4">📋 Rekapitulasi Jadwal Seminar Proposal</h3>
-                <div class="overflow-x-auto">
+                <div class="mb-4 flex items-center space-x-4 flex-wrap gap-2">
+                    <div class="flex items-center space-x-2">
+                        <label class="text-sm font-medium text-gray-700">Filter Tanggal:</label>
+                        <input type="date" id="filterTanggalSeminar" onchange="filterJadwalSeminar()" class="px-3 py-1 border border-gray-300 rounded text-sm">
+                        <button onclick="clearFilterSeminar()" class="px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600">Clear</button>
+                    </div>
+                    <label class="flex items-center">
+                        <input type="checkbox" id="selectAllJadwalSeminar" onchange="toggleSelectAllJadwalSeminar()" class="mr-2">
+                        <span class="text-sm font-medium text-gray-700">Pilih Semua</span>
+                    </label>
+                    <button onclick="hapusDataTerpilih('jadwalSeminar')" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm">HAPUS DATA</button>
+                    <button onclick="printJadwalSeminar()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">🖨️ PRINT JADWAL</button>
+                </div>
+                <div class="overflow-x-auto max-h-96 overflow-y-auto">
                     <table class="w-full table-auto">
                         <thead>
                             <tr class="bg-gray-50">
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Pilih</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Mahasiswa</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Tanggal & Waktu</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Ruangan</th>
@@ -499,35 +588,143 @@
             </div>
 
             <!-- SK Pembimbing -->
-            <div class="bg-white rounded-xl shadow-lg p-6">
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
                 <h3 class="text-xl font-semibold text-gray-800 mb-4">📋 Penetapan Pembimbing</h3>
                 <form class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Mahasiswa</label>
-                        <select id="mahasiswaSelect" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Pilih Mahasiswa</option>
-                        </select>
+                        <div class="relative">
+                            <input type="text" id="mahasiswaSearchInput" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Ketik nama mahasiswa untuk mencari..." onkeyup="searchMahasiswa()" onclick="showMahasiswaOptions()">
+                            <div id="mahasiswaOptions" class="absolute z-10 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-48 overflow-y-auto hidden">
+                                <!-- Options akan muncul di sini -->
+                            </div>
+                        </div>
+                        <input type="hidden" id="selectedMahasiswaNim" value="">
+                        <input type="hidden" id="selectedMahasiswaNama" value="">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Nomor SK</label>
-                        <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="SK/001/2025">
+                        <input type="text" id="nomorSKInput" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="SK/001/2025">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Pembimbing 1</label>
-                        <select id="penguji1Select" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Pilih Penguji 1</option>
+                        <select id="pembimbing1Select" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Pilih Pembimbing 1</option>
                         </select>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Pembimbing 2</label>
-                        <select id="penguji2Select" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Pilih Penguji 2</option>
+                        <select id="pembimbing2Select" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Pilih Pembimbing 2</option>
                         </select>
                     </div>
                     <div class="md:col-span-2">
                         <button type="button" onclick="terbitkanSK()" class="bg-green-600 text-white py-2 px-6 rounded-lg hover:bg-green-700 transition-colors">Terbitkan SK Pembimbing</button>
                     </div>
                 </form>
+            </div>
+
+            <!-- Rekapitulasi Pembimbing -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">📋 Rekapitulasi Penetapan Pembimbing</h3>
+                <div class="mb-4 flex items-center space-x-4">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="selectAllPembimbing" onchange="toggleSelectAllPembimbing()" class="mr-2">
+                        <span class="text-sm font-medium text-gray-700">Pilih Semua</span>
+                    </label>
+                    <button onclick="hapusDataTerpilih('pembimbing')" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm">HAPUS DATA</button>
+                </div>
+                <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                    <table class="w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Pilih</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">NIM</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Nama Mahasiswa</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Nomor SK</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Pembimbing 1</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Pembimbing 2</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Tanggal SK</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rekapPembimbingTable" class="divide-y divide-gray-200">
+                            <!-- Data akan muncul di sini -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Penjadwalan Sidang Munaqosyah -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">🎓 Penjadwalan Sidang Munaqosyah</h3>
+                <form class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Mahasiswa</label>
+                        <select id="munaqosyahMahasiswaSelect" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Pilih Mahasiswa</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal & Waktu</label>
+                        <input type="datetime-local" id="munaqosyahDateTime" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Ruangan</label>
+                        <input type="text" id="munaqosyahRuangan" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Ruang 201">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Penguji 1</label>
+                        <select id="munaqosyahPenguji1" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Pilih Penguji 1</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Penguji 2</label>
+                        <select id="munaqosyahPenguji2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="">Pilih Penguji 2</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button type="button" onclick="buatJadwalMunaqosyah()" class="w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">Buat Jadwal Munaqosyah</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Rekapitulasi Jadwal Munaqosyah -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-semibold text-gray-800 mb-4">📋 Rekapitulasi Jadwal Sidang Munaqosyah</h3>
+                <div class="mb-4 flex items-center space-x-4 flex-wrap gap-2">
+                    <div class="flex items-center space-x-2">
+                        <label class="text-sm font-medium text-gray-700">Filter Tanggal:</label>
+                        <input type="date" id="filterTanggalMunaqosyah" onchange="filterJadwalMunaqosyah()" class="px-3 py-1 border border-gray-300 rounded text-sm">
+                        <button onclick="clearFilterMunaqosyah()" class="px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600">Clear</button>
+                    </div>
+                    <label class="flex items-center">
+                        <input type="checkbox" id="selectAllJadwalMunaqosyah" onchange="toggleSelectAllJadwalMunaqosyah()" class="mr-2">
+                        <span class="text-sm font-medium text-gray-700">Pilih Semua</span>
+                    </label>
+                    <button onclick="hapusDataTerpilih('jadwalMunaqosyah')" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm">HAPUS DATA</button>
+                    <button onclick="printJadwalMunaqosyah()" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm">🖨️ PRINT JADWAL</button>
+                </div>
+                <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                    <table class="w-full table-auto">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Pilih</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Mahasiswa</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Tanggal & Waktu</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Ruangan</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Penguji 1</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Penguji 2</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rekapJadwalMunaqosyah" class="divide-y divide-gray-200">
+                            <!-- Data jadwal akan muncul di sini -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
             </div>
         </div>
@@ -575,7 +772,7 @@
                 <!-- Persetujuan Dosen Wali -->
             <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
                 <h3 class="text-xl font-semibold text-gray-800 mb-4">✍️ Persetujuan Dosen Wali</h3>
-                <div class="overflow-x-auto">
+                <div class="overflow-x-auto max-h-96 overflow-y-auto">
                     <table class="w-full table-auto">
                         <thead>
                             <tr class="bg-gray-50">
@@ -624,16 +821,34 @@
                     <div>
                         <div class="flex justify-between items-center mb-3">
                             <h4 class="font-semibold text-gray-700">Riwayat Bimbingan</h4>
-                            <button onclick="printKartuBimbingan()" class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 no-print">🖨️ Print Kartu</button>
+                            <div class="flex space-x-2">
+                                <button onclick="hapusDataTerpilih('bimbingan')" class="px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700 no-print">🗑️ Hapus Data</button>
+                                <button onclick="printKartuBimbingan()" class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 no-print">🖨️ Print Kartu</button>
+                            </div>
                         </div>
-                        <div id="riwayatBimbingan" class="space-y-3 max-h-96 overflow-y-auto">
-                            <div class="p-3 border border-gray-200 rounded-lg">
-                                <div class="flex justify-between items-start mb-2">
-                                    <span class="font-medium text-sm">Bimbingan #1</span>
-                                    <span class="text-xs text-gray-500">15 Jan 2025</span>
+                        
+                        <!-- Filter Mahasiswa -->
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Filter Mahasiswa</label>
+                            <div class="relative">
+                                <input type="text" id="filterMahasiswaInput" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Ketik nama mahasiswa untuk mencari..." onkeyup="filterMahasiswa()" onclick="showMahasiswaDropdown()">
+                                <div id="mahasiswaDropdown" class="absolute z-10 w-full bg-white border border-gray-300 rounded-lg shadow-lg mt-1 max-h-48 overflow-y-auto hidden">
+                                    <!-- Dropdown options akan muncul di sini -->
                                 </div>
-                                <p class="text-sm text-gray-600 mb-1">Pembahasan BAB I - Pendahuluan</p>
-                                <p class="text-xs text-gray-500">Perbaiki latar belakang masalah</p>
+                            </div>
+                            <div class="mt-2 flex items-center space-x-4">
+                                <button onclick="clearFilter()" class="px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600">Tampilkan Semua</button>
+                                <label class="flex items-center">
+                                    <input type="checkbox" id="selectAllBimbingan" onchange="toggleSelectAllBimbingan()" class="mr-2">
+                                    <span class="text-sm font-medium text-gray-700">Pilih Semua</span>
+                                </label>
+                                <span id="selectedMahasiswaInfo" class="text-sm text-gray-600"></span>
+                            </div>
+                        </div>
+                        
+                        <div id="riwayatBimbingan" class="space-y-3 max-h-96 overflow-y-auto">
+                            <div class="p-3 border border-gray-200 rounded-lg text-center text-gray-500">
+                                <p class="text-sm">Pilih mahasiswa untuk melihat riwayat bimbingan</p>
                             </div>
                         </div>
                     </div>
@@ -704,7 +919,7 @@
 
                     <div class="bg-white rounded-xl shadow-lg p-6">
                         <h3 class="text-xl font-semibold text-gray-800 mb-4">📋 Daftar Akun Mahasiswa</h3>
-                        <div class="overflow-x-auto">
+                        <div class="overflow-x-auto max-h-96 overflow-y-auto">
                             <table class="w-full table-auto">
                                 <thead>
                                     <tr class="bg-gray-50">
@@ -746,7 +961,7 @@
 
                     <div class="bg-white rounded-xl shadow-lg p-6">
                         <h3 class="text-xl font-semibold text-gray-800 mb-4">📋 Daftar Akun Program Studi</h3>
-                        <div class="overflow-x-auto">
+                        <div class="overflow-x-auto max-h-96 overflow-y-auto">
                             <table class="w-full table-auto">
                                 <thead>
                                     <tr class="bg-gray-50">
@@ -788,7 +1003,7 @@
 
                     <div class="bg-white rounded-xl shadow-lg p-6">
                         <h3 class="text-xl font-semibold text-gray-800 mb-4">📋 Daftar Akun Dosen</h3>
-                        <div class="overflow-x-auto">
+                        <div class="overflow-x-auto max-h-96 overflow-y-auto">
                             <table class="w-full table-auto">
                                 <thead>
                                     <tr class="bg-gray-50">
@@ -924,6 +1139,13 @@
             munaqosyahSnapshot.forEach(doc => {
                 submissions.munaqosyah.push({ id: doc.id, ...doc.data() });
             });
+
+            // Load pembimbing data
+            const pembimbingSnapshot = await getDocs(collection(db, 'penetapan_pembimbing'));
+            submissions.pembimbing = [];
+            pembimbingSnapshot.forEach(doc => {
+                submissions.pembimbing.push({ id: doc.id, ...doc.data() });
+            });
         }
 
         // Load notifications from Firebase
@@ -996,7 +1218,9 @@
             updateDosenTable();
             updateJudulValidasiTable();
             updateRekapJadwalSeminar();
+            updateRekapJadwalMunaqosyah();
             updateRekapPengajuanSeminar();
+            updateRekapPembimbingTable();
             updateDropdownOptions();
             updateRiwayatBimbingan();
             updatePersetujuanDosenTable();
@@ -1027,51 +1251,209 @@
             });
         }
         
-        function updateRiwayatBimbingan(snapshot) {
+        // Global variable to store selected mahasiswa for filtering
+        let selectedMahasiswaFilter = null;
+
+        function updateRiwayatBimbingan(snapshot, filterMahasiswa = null) {
             const container = document.getElementById('riwayatBimbingan');
             if (!container) return;
             
             container.innerHTML = '';
             
+            let bimbinganData = [];
+            
             // If snapshot is provided (from Firebase), use it
             if (snapshot) {
-                let count = 1;
                 snapshot.forEach(doc => {
-                    const data = doc.data();
-                    const div = document.createElement('div');
-                    div.className = 'p-3 border border-gray-200 rounded-lg';
-                    div.innerHTML = `
-                        <div class="flex justify-between items-start mb-2">
-                            <span class="font-medium text-sm">Bimbingan #${count}</span>
-                            <span class="text-xs text-gray-500">${data.tanggal}</span>
-                        </div>
-                        <p class="text-sm text-gray-600 mb-1">${data.materi}</p>
-                        <p class="text-xs text-gray-500">${data.catatan}</p>
-                    `;
-                    container.appendChild(div);
-                    count++;
+                    bimbinganData.push(doc.data());
                 });
             } else {
                 // Use local submissions data
-                if (submissions.bimbingan.length > 0) {
-                    submissions.bimbingan.forEach((bimbingan, index) => {
-                        const div = document.createElement('div');
-                        div.className = 'p-3 border border-gray-200 rounded-lg';
-                        div.innerHTML = `
-                            <div class="flex justify-between items-start mb-2">
+                bimbinganData = submissions.bimbingan;
+            }
+            
+            // Filter by selected mahasiswa if specified
+            if (filterMahasiswa) {
+                bimbinganData = bimbinganData.filter(bimbingan => 
+                    bimbingan.mahasiswa === filterMahasiswa
+                );
+            }
+            
+            if (bimbinganData.length > 0) {
+                bimbinganData.forEach((bimbingan, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'p-3 border border-gray-200 rounded-lg';
+                    
+                    // Ensure we have a valid ID for the checkbox
+                    const bimbinganId = bimbingan.id || `bimbingan_${Date.now()}_${index}`;
+                    const mahasiswaName = bimbingan.mahasiswa || 'Unknown';
+                    
+                    const checkboxHtml = `<input type="checkbox" class="bimbingan-checkbox" data-id="${bimbinganId}" data-mahasiswa="${mahasiswaName}">`;
+                    
+                    div.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center space-x-2">
+                                ${checkboxHtml}
                                 <span class="font-medium text-sm">Bimbingan #${index + 1}</span>
-                                <span class="text-xs text-gray-500">${bimbingan.tanggal}</span>
                             </div>
-                            <p class="text-sm text-gray-600 mb-1">${bimbingan.materi}</p>
-                            <p class="text-xs text-gray-500">${bimbingan.catatan}</p>
-                        `;
-                        container.appendChild(div);
-                    });
-                } else {
-                    container.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">Belum ada riwayat bimbingan</p>';
-                }
+                            <span class="text-xs text-gray-500">${bimbingan.tanggal || 'Tanggal tidak tersedia'}</span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-1"><strong>Mahasiswa:</strong> ${mahasiswaName}</p>
+                        <p class="text-sm text-gray-600 mb-1"><strong>Materi:</strong> ${bimbingan.materi || 'Tidak ada materi'}</p>
+                        <p class="text-xs text-gray-500"><strong>Catatan:</strong> ${bimbingan.catatan || 'Tidak ada catatan'}</p>
+                    `;
+                    container.appendChild(div);
+                });
+            } else {
+                const message = filterMahasiswa ? 
+                    `Belum ada riwayat bimbingan untuk ${filterMahasiswa}` : 
+                    'Pilih mahasiswa untuk melihat riwayat bimbingan';
+                container.innerHTML = `<div class="p-3 border border-gray-200 rounded-lg text-center text-gray-500"><p class="text-sm">${message}</p></div>`;
             }
         }
+
+        // Show mahasiswa dropdown - only show assigned mahasiswa
+        function showMahasiswaDropdown() {
+            const dropdown = document.getElementById('mahasiswaDropdown');
+            const input = document.getElementById('filterMahasiswaInput');
+            
+            if (!dropdown || !input) return;
+            
+            const dosenLogin = sessionStorage.getItem('dosenLogin');
+            if (!dosenLogin) return;
+            
+            // Find dosen name from accounts
+            const dosen = accounts.dosen.find(d => d.username === dosenLogin);
+            if (!dosen) return;
+            
+            // Get mahasiswa that are assigned to this dosen as pembimbing
+            const assignedMahasiswa = submissions.pembimbing.filter(p => 
+                p.pembimbing1 === dosen.nama || p.pembimbing2 === dosen.nama
+            );
+            
+            dropdown.innerHTML = '';
+            
+            if (assignedMahasiswa.length > 0) {
+                assignedMahasiswa.forEach(pembimbing => {
+                    const mahasiswaName = `${pembimbing.nama} (${pembimbing.nim})`;
+                    if (mahasiswaName.toLowerCase().includes(input.value.toLowerCase())) {
+                        const option = document.createElement('div');
+                        option.className = 'px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm';
+                        option.textContent = mahasiswaName;
+                        option.onclick = () => selectMahasiswa(mahasiswaName);
+                        dropdown.appendChild(option);
+                    }
+                });
+            } else {
+                const option = document.createElement('div');
+                option.className = 'px-3 py-2 text-gray-500 text-sm';
+                option.textContent = 'Belum ada mahasiswa bimbingan yang ditetapkan';
+                dropdown.appendChild(option);
+            }
+            
+            dropdown.classList.remove('hidden');
+        }
+
+        // Filter mahasiswa based on input - only show assigned mahasiswa
+        function filterMahasiswa() {
+            const input = document.getElementById('filterMahasiswaInput');
+            const dropdown = document.getElementById('mahasiswaDropdown');
+            
+            if (!input || !dropdown) return;
+            
+            const searchTerm = input.value.toLowerCase();
+            const dosenLogin = sessionStorage.getItem('dosenLogin');
+            if (!dosenLogin) return;
+            
+            // Find dosen name from accounts
+            const dosen = accounts.dosen.find(d => d.username === dosenLogin);
+            if (!dosen) return;
+            
+            // Get mahasiswa that are assigned to this dosen as pembimbing
+            const assignedMahasiswa = submissions.pembimbing.filter(p => 
+                p.pembimbing1 === dosen.nama || p.pembimbing2 === dosen.nama
+            );
+            
+            dropdown.innerHTML = '';
+            
+            if (assignedMahasiswa.length > 0) {
+                const filteredMahasiswa = assignedMahasiswa.filter(pembimbing => {
+                    const mahasiswaName = `${pembimbing.nama} (${pembimbing.nim})`;
+                    return mahasiswaName.toLowerCase().includes(searchTerm);
+                });
+                
+                if (filteredMahasiswa.length > 0) {
+                    filteredMahasiswa.forEach(pembimbing => {
+                        const mahasiswaName = `${pembimbing.nama} (${pembimbing.nim})`;
+                        const option = document.createElement('div');
+                        option.className = 'px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm';
+                        option.textContent = mahasiswaName;
+                        option.onclick = () => selectMahasiswa(mahasiswaName);
+                        dropdown.appendChild(option);
+                    });
+                } else {
+                    const option = document.createElement('div');
+                    option.className = 'px-3 py-2 text-gray-500 text-sm';
+                    option.textContent = 'Tidak ada mahasiswa yang cocok';
+                    dropdown.appendChild(option);
+                }
+            } else {
+                const option = document.createElement('div');
+                option.className = 'px-3 py-2 text-gray-500 text-sm';
+                option.textContent = 'Belum ada mahasiswa bimbingan yang ditetapkan';
+                dropdown.appendChild(option);
+            }
+            
+            dropdown.classList.remove('hidden');
+        }
+
+        // Select mahasiswa from dropdown
+        function selectMahasiswa(mahasiswa) {
+            const input = document.getElementById('filterMahasiswaInput');
+            const dropdown = document.getElementById('mahasiswaDropdown');
+            const info = document.getElementById('selectedMahasiswaInfo');
+            
+            if (input) input.value = mahasiswa;
+            if (dropdown) dropdown.classList.add('hidden');
+            if (info) info.textContent = `Menampilkan riwayat: ${mahasiswa}`;
+            
+            selectedMahasiswaFilter = mahasiswa;
+            
+            // Update riwayat bimbingan with filter
+            updateRiwayatBimbingan(null, mahasiswa);
+        }
+
+        // Clear filter
+        function clearFilter() {
+            const input = document.getElementById('filterMahasiswaInput');
+            const dropdown = document.getElementById('mahasiswaDropdown');
+            const info = document.getElementById('selectedMahasiswaInfo');
+            
+            if (input) input.value = '';
+            if (dropdown) dropdown.classList.add('hidden');
+            if (info) info.textContent = '';
+            
+            selectedMahasiswaFilter = null;
+            
+            // Update riwayat bimbingan without filter
+            updateRiwayatBimbingan();
+        }
+
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('mahasiswaDropdown');
+            const input = document.getElementById('filterMahasiswaInput');
+            const dropdown2 = document.getElementById('mahasiswaOptions');
+            const input2 = document.getElementById('mahasiswaSearchInput');
+            
+            if (dropdown && input && !dropdown.contains(event.target) && event.target !== input) {
+                dropdown.classList.add('hidden');
+            }
+            
+            if (dropdown2 && input2 && !dropdown2.contains(event.target) && event.target !== input2) {
+                dropdown2.classList.add('hidden');
+            }
+        });
         
         // Print functionality with PDF support
         function printKartuBimbingan() {
@@ -1080,21 +1462,29 @@
                 event.preventDefault();
             }
             
-            // Get the selected mahasiswa from the form
-            const mahasiswaSelect = document.querySelector('#portalDosen form select');
-            const mahasiswa = mahasiswaSelect ? mahasiswaSelect.value : 'Ahmad Fauzi (2021001)';
+            // Get the selected mahasiswa from filter or form
+            let mahasiswa = selectedMahasiswaFilter;
+            if (!mahasiswa) {
+                const mahasiswaSelect = document.querySelector('#portalDosen form select');
+                mahasiswa = mahasiswaSelect ? mahasiswaSelect.value : 'Ahmad Fauzi (2021001)';
+            }
             
-            // Get riwayat bimbingan content
-            const riwayatContainer = document.getElementById('riwayatBimbingan');
+            // If no mahasiswa selected, show alert
+            if (!mahasiswa || mahasiswa === '') {
+                alert('Silakan pilih mahasiswa terlebih dahulu untuk mencetak kartu bimbingan!');
+                return;
+            }
+            
+            // Get filtered bimbingan data
+            let bimbinganData = submissions.bimbingan.filter(b => b.mahasiswa === mahasiswa);
             let riwayatContent = '';
             
-            if (riwayatContainer && riwayatContainer.children.length > 0) {
-                // Convert riwayat to print-friendly format
-                Array.from(riwayatContainer.children).forEach((item, index) => {
+            if (bimbinganData.length > 0) {
+                bimbinganData.forEach((bimbingan, index) => {
                     const bimbinganNum = index + 1;
-                    const tanggal = item.querySelector('.text-xs.text-gray-500')?.textContent || '';
-                    const materi = item.querySelector('.text-sm.text-gray-600')?.textContent || '';
-                    const catatan = item.querySelectorAll('.text-xs.text-gray-500')[1]?.textContent || '';
+                    const tanggal = bimbingan.tanggal || '';
+                    const materi = bimbingan.materi || '';
+                    const catatan = bimbingan.catatan || '';
                     
                     riwayatContent += `
                         <div style="margin-bottom: 16px; padding: 12px; border: 1px solid #d1d5db; page-break-inside: avoid;">
@@ -1113,17 +1503,8 @@
                 });
             } else {
                 riwayatContent = `
-                    <div style="margin-bottom: 16px; padding: 12px; border: 1px solid #d1d5db; page-break-inside: avoid;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: bold;">
-                            <span>Bimbingan #1</span>
-                            <span>15 Jan 2025</span>
-                        </div>
-                        <div style="margin-bottom: 8px;">
-                            <strong>Materi:</strong> Pembahasan BAB I - Pendahuluan
-                        </div>
-                        <div>
-                            <strong>Catatan:</strong> Perbaiki latar belakang masalah
-                        </div>
+                    <div style="margin-bottom: 16px; padding: 12px; border: 1px solid #d1d5db; page-break-inside: avoid; text-align: center; color: #666;">
+                        <p>Belum ada riwayat bimbingan untuk mahasiswa ini</p>
                     </div>
                 `;
             }
@@ -1345,7 +1726,9 @@
             pengajuanSeminar: [],
             bimbingan: [],
             jadwalSeminar: [],
+            jadwalMunaqosyah: [],
             munaqosyah: [],
+            pembimbing: [],
             notifikasi: {
                 mahasiswa: {},
                 dosen: {},
@@ -2080,22 +2463,63 @@
                 return;
             }
             
+            // Find mahasiswa name
+            const mahasiswa = accounts.mahasiswa.find(m => m.nim === nim);
+            if (!mahasiswa) {
+                alert('NIM tidak ditemukan!');
+                return;
+            }
+            
+            // Create munaqosyah submission
+            const munaqosyahBaru = {
+                id: Date.now().toString(),
+                nim: nim,
+                nama: mahasiswa.nama,
+                jumlahBimbingan: parseInt(jumlahBimbingan),
+                catatanSkripsi: catatanSkripsi,
+                catatanKartuBimbingan: catatanKartuBimbingan,
+                status: 'Menunggu Penjadwalan',
+                tanggalPengajuan: new Date().toLocaleDateString('id-ID'),
+                timestamp: new Date()
+            };
+            
+            // Add to local storage
+            submissions.munaqosyah.push(munaqosyahBaru);
+            
+            // Add notification for prodi
+            submissions.notifikasi.prodi.push({
+                id: Date.now().toString(),
+                type: 'pengajuan_munaqosyah',
+                message: 'Pengajuan sidang munaqosyah baru',
+                nim: nim,
+                nama: mahasiswa.nama,
+                tanggal: new Date().toLocaleDateString('id-ID'),
+                waktu: new Date().toLocaleTimeString('id-ID')
+            });
+            
             try {
-                await addDoc(collection(db, 'pengajuan_munaqosyah'), {
+                await addDoc(collection(db, 'pengajuan_munaqosyah'), munaqosyahBaru);
+                
+                // Save notification to Firebase
+                await addDoc(collection(db, 'notifikasi'), {
+                    type: 'pengajuan_munaqosyah',
+                    message: 'Pengajuan sidang munaqosyah baru',
                     nim: nim,
-                    jumlahBimbingan: parseInt(jumlahBimbingan),
-                    catatanSkripsi: catatanSkripsi,
-                    catatanKartuBimbingan: catatanKartuBimbingan,
-                    status: 'Menunggu Penjadwalan',
+                    nama: mahasiswa.nama,
                     timestamp: new Date()
                 });
                 
                 alert('Pengajuan sidang munaqosyah berhasil disubmit! Menunggu penjadwalan dari Program Studi.');
-                form.reset();
             } catch (error) {
                 console.log('Demo mode - data saved locally');
+                saveLocalData();
                 alert('Pengajuan sidang munaqosyah berhasil disubmit! Menunggu penjadwalan dari Program Studi.');
             }
+            
+            form.reset();
+            
+            // Update prodi notifications
+            updateProdiNotifications();
         }
 
         // Program Studi functions
@@ -2279,10 +2703,7 @@
                     else if (submission.status === 'Ditolak') statusClass = 'bg-red-100 text-red-800';
                     else if (submission.status === 'Perlu Perbaikan') statusClass = 'bg-yellow-100 text-yellow-800';
                     
-                    const isDisabled = submission.status !== 'Menunggu';
-                    const checkboxHtml = isDisabled ? 
-                        `<input type="checkbox" class="judul-checkbox" disabled>` :
-                        `<input type="checkbox" class="judul-checkbox" data-nim="${submission.nim}" data-nama="${submission.nama}" data-id="${submission.id}">`;
+                    const checkboxHtml = `<input type="checkbox" class="judul-checkbox" data-nim="${submission.nim}" data-nama="${submission.nama}" data-id="${submission.id}">`;
                     
                     row.innerHTML = `
                         <td class="px-4 py-3">${checkboxHtml}</td>
@@ -2404,26 +2825,167 @@
             updateDosenNotifications();
         }
 
-        function terbitkanSK() {
+        // Search mahasiswa functions for penetapan pembimbing
+        function showMahasiswaOptions() {
+            const dropdown = document.getElementById('mahasiswaOptions');
+            const input = document.getElementById('mahasiswaSearchInput');
+            
+            if (!dropdown || !input) return;
+            
+            // Get active mahasiswa
+            const activeMahasiswa = accounts.mahasiswa.filter(m => m.status === 'aktif');
+            
+            dropdown.innerHTML = '';
+            
+            if (activeMahasiswa.length > 0) {
+                activeMahasiswa.forEach(mahasiswa => {
+                    if (mahasiswa.nama.toLowerCase().includes(input.value.toLowerCase())) {
+                        const option = document.createElement('div');
+                        option.className = 'px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm';
+                        option.textContent = `${mahasiswa.nama} (${mahasiswa.nim})`;
+                        option.onclick = () => selectMahasiswaOption(mahasiswa.nim, mahasiswa.nama);
+                        dropdown.appendChild(option);
+                    }
+                });
+            } else {
+                const option = document.createElement('div');
+                option.className = 'px-3 py-2 text-gray-500 text-sm';
+                option.textContent = 'Belum ada data mahasiswa';
+                dropdown.appendChild(option);
+            }
+            
+            dropdown.classList.remove('hidden');
+        }
+
+        function searchMahasiswa() {
+            const input = document.getElementById('mahasiswaSearchInput');
+            const dropdown = document.getElementById('mahasiswaOptions');
+            
+            if (!input || !dropdown) return;
+            
+            const searchTerm = input.value.toLowerCase();
+            
+            // Get active mahasiswa
+            const activeMahasiswa = accounts.mahasiswa.filter(m => m.status === 'aktif');
+            
+            dropdown.innerHTML = '';
+            
+            if (activeMahasiswa.length > 0) {
+                const filteredMahasiswa = activeMahasiswa.filter(mahasiswa => 
+                    mahasiswa.nama.toLowerCase().includes(searchTerm) || 
+                    mahasiswa.nim.includes(searchTerm)
+                );
+                
+                if (filteredMahasiswa.length > 0) {
+                    filteredMahasiswa.forEach(mahasiswa => {
+                        const option = document.createElement('div');
+                        option.className = 'px-3 py-2 hover:bg-blue-50 cursor-pointer text-sm';
+                        option.textContent = `${mahasiswa.nama} (${mahasiswa.nim})`;
+                        option.onclick = () => selectMahasiswaOption(mahasiswa.nim, mahasiswa.nama);
+                        dropdown.appendChild(option);
+                    });
+                } else {
+                    const option = document.createElement('div');
+                    option.className = 'px-3 py-2 text-gray-500 text-sm';
+                    option.textContent = 'Tidak ada mahasiswa yang cocok';
+                    dropdown.appendChild(option);
+                }
+            } else {
+                const option = document.createElement('div');
+                option.className = 'px-3 py-2 text-gray-500 text-sm';
+                option.textContent = 'Belum ada data mahasiswa';
+                dropdown.appendChild(option);
+            }
+            
+            dropdown.classList.remove('hidden');
+        }
+
+        function selectMahasiswaOption(nim, nama) {
+            const input = document.getElementById('mahasiswaSearchInput');
+            const dropdown = document.getElementById('mahasiswaOptions');
+            const nimHidden = document.getElementById('selectedMahasiswaNim');
+            const namaHidden = document.getElementById('selectedMahasiswaNama');
+            
+            if (input) input.value = `${nama} (${nim})`;
+            if (dropdown) dropdown.classList.add('hidden');
+            if (nimHidden) nimHidden.value = nim;
+            if (namaHidden) namaHidden.value = nama;
+        }
+
+        async function terbitkanSK() {
             // Prevent default form submission
             if (event && event.preventDefault) {
                 event.preventDefault();
             }
             
-            const form = event ? event.target.closest('form') : document.querySelector('#portalProdi form:last-of-type');
-            const mahasiswa = form.querySelector('select').value;
-            const nomorSK = form.querySelector('input[placeholder="SK/001/2025"]').value;
-            const pembimbing1 = form.querySelectorAll('select')[1].value;
-            const pembimbing2 = form.querySelectorAll('select')[2].value;
+            const nim = document.getElementById('selectedMahasiswaNim').value;
+            const nama = document.getElementById('selectedMahasiswaNama').value;
+            const nomorSK = document.getElementById('nomorSKInput').value;
+            const pembimbing1 = document.getElementById('pembimbing1Select').value;
+            const pembimbing2 = document.getElementById('pembimbing2Select').value;
             
-            if (!mahasiswa || !nomorSK || !pembimbing1 || !pembimbing2) {
+            if (!nim || !nama || !nomorSK || !pembimbing1 || !pembimbing2) {
                 alert('Mohon lengkapi semua field!');
                 return;
             }
             
-            alert(`SK Pembimbing berhasil diterbitkan!\n\nNomor SK: ${nomorSK}\nMahasiswa: ${mahasiswa}\nPembimbing 1: ${pembimbing1}\nPembimbing 2: ${pembimbing2}\n\nDokumen akan dikirim ke dosen pembimbing.`);
-            form.reset();
+            // Check if mahasiswa already has pembimbing
+            const existingPembimbing = submissions.pembimbing.find(p => p.nim === nim);
+            if (existingPembimbing) {
+                alert('Mahasiswa ini sudah memiliki pembimbing yang ditetapkan!');
+                return;
+            }
+            
+            // Create pembimbing data
+            const pembimbingBaru = {
+                id: Date.now().toString(),
+                nim: nim,
+                nama: nama,
+                nomorSK: nomorSK,
+                pembimbing1: pembimbing1,
+                pembimbing2: pembimbing2,
+                tanggalSK: new Date().toLocaleDateString('id-ID'),
+                status: 'Aktif',
+                timestamp: new Date()
+            };
+            
+            // Add to local storage
+            submissions.pembimbing.push(pembimbingBaru);
+            
+            try {
+                // Save to Firebase
+                await addDoc(collection(db, 'penetapan_pembimbing'), pembimbingBaru);
+            } catch (error) {
+                console.log('Demo mode - data saved locally');
+                saveLocalData();
+            }
+            
+            alert(`SK Pembimbing berhasil diterbitkan!\n\nNomor SK: ${nomorSK}\nMahasiswa: ${nama} (${nim})\nPembimbing 1: ${pembimbing1}\nPembimbing 2: ${pembimbing2}\n\nDokumen akan dikirim ke dosen pembimbing.`);
+            
+            // Clear form
+            document.getElementById('mahasiswaSearchInput').value = '';
+            document.getElementById('selectedMahasiswaNim').value = '';
+            document.getElementById('selectedMahasiswaNama').value = '';
+            document.getElementById('nomorSKInput').value = '';
+            document.getElementById('pembimbing1Select').value = '';
+            document.getElementById('pembimbing2Select').value = '';
+            
+            // Update rekapitulasi table
+            updateRekapPembimbingTable();
+            
+            // Update dosen dropdown options
+            updateDosenDropdownOptions();
         }
+
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('mahasiswaOptions');
+            const input = document.getElementById('mahasiswaSearchInput');
+            
+            if (dropdown && input && !dropdown.contains(event.target) && event.target !== input) {
+                dropdown.classList.add('hidden');
+            }
+        });
 
         // Dosen functions
         async function tandatanganiForm(nim) {
@@ -2503,14 +3065,22 @@
             alert('Data bimbingan berhasil disimpan!');
             form.reset();
             
-            // Update riwayat bimbingan display
-            updateRiwayatBimbingan();
+            // Auto-select the mahasiswa in filter if not already selected
+            if (!selectedMahasiswaFilter) {
+                selectMahasiswa(mahasiswa);
+            } else if (selectedMahasiswaFilter === mahasiswa) {
+                // Update riwayat bimbingan with current filter
+                updateRiwayatBimbingan(null, selectedMahasiswaFilter);
+            } else {
+                // Update riwayat bimbingan display without filter
+                updateRiwayatBimbingan();
+            }
         }
 
         // Update dropdown options based on accounts
         function updateDropdownOptions() {
             // Update mahasiswa dropdowns
-            const mahasiswaSelects = document.querySelectorAll('#mahasiswaSelect, select[id*="mahasiswa"]');
+            const mahasiswaSelects = document.querySelectorAll('#mahasiswaSelect, #munaqosyahMahasiswaSelect, select[id*="mahasiswa"]');
             mahasiswaSelects.forEach(select => {
                 const currentValue = select.value;
                 select.innerHTML = '<option value="">Pilih Mahasiswa</option>';
@@ -2526,11 +3096,15 @@
             });
             
             // Update dosen dropdowns for penguji/pembimbing
-            const dosenSelects = document.querySelectorAll('#penguji1Select, #penguji2Select, select[id*="pembimbing"], select[id*="penguji"]');
+            const dosenSelects = document.querySelectorAll('#penguji1Select, #penguji2Select, #pembimbing1Select, #pembimbing2Select, #munaqosyahPenguji1, #munaqosyahPenguji2, select[id*="pembimbing"], select[id*="penguji"]');
             dosenSelects.forEach(select => {
                 const currentValue = select.value;
-                const placeholder = select.id.includes('penguji1') || select.id.includes('pembimbing1') ? 'Pilih Penguji 1' : 
-                                  select.id.includes('penguji2') || select.id.includes('pembimbing2') ? 'Pilih Penguji 2' : 'Pilih Dosen';
+                let placeholder = 'Pilih Dosen';
+                if (select.id.includes('penguji1') || select.id.includes('pembimbing1')) placeholder = 'Pilih Pembimbing 1';
+                else if (select.id.includes('penguji2') || select.id.includes('pembimbing2')) placeholder = 'Pilih Pembimbing 2';
+                else if (select.id.includes('munaqosyahPenguji1')) placeholder = 'Pilih Penguji 1';
+                else if (select.id.includes('munaqosyahPenguji2')) placeholder = 'Pilih Penguji 2';
+                
                 select.innerHTML = `<option value="">${placeholder}</option>`;
                 accounts.dosen.forEach(dosen => {
                     if (dosen.status === 'aktif') {
@@ -2543,20 +3117,202 @@
                 });
             });
 
-            // Update dosen dropdown in bimbingan form
+            // Update dosen dropdown in bimbingan form - only show mahasiswa with assigned pembimbing
+            updateDosenDropdownOptions();
+        }
+
+        // Update dosen dropdown options to show only assigned mahasiswa
+        function updateDosenDropdownOptions() {
             const bimbinganMahasiswaSelect = document.getElementById('bimbinganMahasiswaSelect');
-            if (bimbinganMahasiswaSelect) {
-                const currentValue = bimbinganMahasiswaSelect.value;
-                bimbinganMahasiswaSelect.innerHTML = '<option value="">Pilih Mahasiswa</option>';
-                accounts.mahasiswa.forEach(mhs => {
-                    if (mhs.status === 'aktif') {
-                        const option = document.createElement('option');
-                        option.value = `${mhs.nama} (${mhs.nim})`;
-                        option.textContent = `${mhs.nama} (${mhs.nim})`;
-                        if (option.value === currentValue) option.selected = true;
-                        bimbinganMahasiswaSelect.appendChild(option);
-                    }
+            if (!bimbinganMahasiswaSelect) return;
+            
+            const dosenLogin = sessionStorage.getItem('dosenLogin');
+            if (!dosenLogin) return;
+            
+            // Find dosen name from accounts
+            const dosen = accounts.dosen.find(d => d.username === dosenLogin);
+            if (!dosen) return;
+            
+            const currentValue = bimbinganMahasiswaSelect.value;
+            bimbinganMahasiswaSelect.innerHTML = '<option value="">Pilih Mahasiswa</option>';
+            
+            // Get mahasiswa that are assigned to this dosen as pembimbing
+            const assignedMahasiswa = submissions.pembimbing.filter(p => 
+                p.pembimbing1 === dosen.nama || p.pembimbing2 === dosen.nama
+            );
+            
+            if (assignedMahasiswa.length > 0) {
+                assignedMahasiswa.forEach(pembimbing => {
+                    const option = document.createElement('option');
+                    option.value = `${pembimbing.nama} (${pembimbing.nim})`;
+                    option.textContent = `${pembimbing.nama} (${pembimbing.nim})`;
+                    if (option.value === currentValue) option.selected = true;
+                    bimbinganMahasiswaSelect.appendChild(option);
                 });
+            }
+            
+            // Update filter dropdown for riwayat bimbingan
+            updateFilterDropdownOptions();
+        }
+
+        // Munaqosyah scheduling function
+        async function buatJadwalMunaqosyah() {
+            // Prevent default form submission
+            if (event && event.preventDefault) {
+                event.preventDefault();
+            }
+            
+            const mahasiswa = document.getElementById('munaqosyahMahasiswaSelect').value;
+            const tanggal = document.getElementById('munaqosyahDateTime').value;
+            const ruangan = document.getElementById('munaqosyahRuangan').value;
+            const penguji1 = document.getElementById('munaqosyahPenguji1').value;
+            const penguji2 = document.getElementById('munaqosyahPenguji2').value;
+            
+            if (!mahasiswa || !tanggal || !ruangan || !penguji1 || !penguji2) {
+                alert('Mohon lengkapi semua field!');
+                return;
+            }
+            
+            // Extract NIM from mahasiswa string (format: "Nama (NIM)")
+            const nimMatch = mahasiswa.match(/\((\d+)\)/);
+            const nim = nimMatch ? nimMatch[1] : '';
+            const nama = mahasiswa.split(' (')[0];
+            
+            // Create jadwal object
+            const jadwalBaru = {
+                id: Date.now().toString(),
+                mahasiswa: mahasiswa,
+                nim: nim,
+                nama: nama,
+                tanggal: tanggal,
+                ruangan: ruangan,
+                penguji1: penguji1,
+                penguji2: penguji2,
+                status: 'Terjadwal',
+                tanggalBuat: new Date().toLocaleDateString('id-ID')
+            };
+            
+            // Add to local storage
+            submissions.jadwalMunaqosyah.push(jadwalBaru);
+            
+            // Add notification for mahasiswa
+            if (!submissions.notifikasi.mahasiswa[nim]) {
+                submissions.notifikasi.mahasiswa[nim] = [];
+            }
+            submissions.notifikasi.mahasiswa[nim].push({
+                id: Date.now().toString(),
+                type: 'jadwal_munaqosyah',
+                message: 'Jadwal sidang munaqosyah Anda telah ditetapkan',
+                tanggal: new Date(tanggal).toLocaleDateString('id-ID'),
+                waktu: new Date(tanggal).toLocaleTimeString('id-ID'),
+                ruangan: ruangan,
+                penguji1: penguji1,
+                penguji2: penguji2,
+                tanggalNotif: new Date().toLocaleDateString('id-ID')
+            });
+            
+            // Add notification for dosen
+            [penguji1, penguji2].forEach(dosen => {
+                if (!submissions.notifikasi.dosen[dosen]) {
+                    submissions.notifikasi.dosen[dosen] = [];
+                }
+                submissions.notifikasi.dosen[dosen].push({
+                    id: Date.now().toString() + dosen,
+                    type: 'jadwal_munaqosyah',
+                    message: `Anda ditugaskan sebagai penguji sidang munaqosyah`,
+                    mahasiswa: nama,
+                    nim: nim,
+                    tanggal: new Date(tanggal).toLocaleDateString('id-ID'),
+                    waktu: new Date(tanggal).toLocaleTimeString('id-ID'),
+                    ruangan: ruangan,
+                    tanggalNotif: new Date().toLocaleDateString('id-ID')
+                });
+            });
+            
+            try {
+                // Save to Firebase
+                await addDoc(collection(db, 'jadwal_munaqosyah'), jadwalBaru);
+                
+                // Save notifications to Firebase
+                await addDoc(collection(db, 'notifikasi'), {
+                    nim: nim,
+                    nama: nama,
+                    type: 'jadwal_munaqosyah',
+                    message: 'Jadwal sidang munaqosyah Anda telah ditetapkan',
+                    tanggal: new Date(tanggal).toLocaleDateString('id-ID'),
+                    waktu: new Date(tanggal).toLocaleTimeString('id-ID'),
+                    ruangan: ruangan,
+                    penguji1: penguji1,
+                    penguji2: penguji2,
+                    timestamp: new Date()
+                });
+            } catch (error) {
+                console.log('Demo mode - jadwal saved locally');
+                saveLocalData();
+            }
+            
+            alert(`Jadwal sidang munaqosyah berhasil dibuat!\n\nMahasiswa: ${mahasiswa}\nTanggal: ${new Date(tanggal).toLocaleString('id-ID')}\nRuangan: ${ruangan}\nPenguji 1: ${penguji1}\nPenguji 2: ${penguji2}\n\nNotifikasi telah dikirim ke mahasiswa dan dosen penguji.`);
+            
+            // Clear form
+            document.getElementById('munaqosyahMahasiswaSelect').value = '';
+            document.getElementById('munaqosyahDateTime').value = '';
+            document.getElementById('munaqosyahRuangan').value = '';
+            document.getElementById('munaqosyahPenguji1').value = '';
+            document.getElementById('munaqosyahPenguji2').value = '';
+            
+            // Update rekapitulasi table
+            updateRekapJadwalMunaqosyah();
+            
+            // Update notifications
+            updateMahasiswaNotifications();
+            updateDosenNotifications();
+        }
+
+        // Update filter dropdown options for riwayat bimbingan
+        function updateFilterDropdownOptions() {
+            const dosenLogin = sessionStorage.getItem('dosenLogin');
+            if (!dosenLogin) return;
+            
+            // Find dosen name from accounts
+            const dosen = accounts.dosen.find(d => d.username === dosenLogin);
+            if (!dosen) return;
+            
+            // Get mahasiswa that are assigned to this dosen as pembimbing
+            const assignedMahasiswa = submissions.pembimbing.filter(p => 
+                p.pembimbing1 === dosen.nama || p.pembimbing2 === dosen.nama
+            );
+            
+            // Update the mahasiswa list for filter dropdown
+            window.assignedMahasiswaList = assignedMahasiswa.map(p => `${p.nama} (${p.nim})`);
+        }
+
+        // Update rekapitulasi pembimbing table
+        function updateRekapPembimbingTable() {
+            const tbody = document.getElementById('rekapPembimbingTable');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            if (submissions.pembimbing.length > 0) {
+                submissions.pembimbing.forEach(pembimbing => {
+                    const row = document.createElement('tr');
+                    const statusClass = pembimbing.status === 'Aktif' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+                    const checkboxHtml = `<input type="checkbox" class="pembimbing-checkbox" data-id="${pembimbing.id}" data-nim="${pembimbing.nim}">`;
+                    
+                    row.innerHTML = `
+                        <td class="px-4 py-3">${checkboxHtml}</td>
+                        <td class="px-4 py-3 text-sm">${pembimbing.nim}</td>
+                        <td class="px-4 py-3 text-sm">${pembimbing.nama}</td>
+                        <td class="px-4 py-3 text-sm">${pembimbing.nomorSK}</td>
+                        <td class="px-4 py-3 text-sm">${pembimbing.pembimbing1}</td>
+                        <td class="px-4 py-3 text-sm">${pembimbing.pembimbing2}</td>
+                        <td class="px-4 py-3 text-sm">${pembimbing.tanggalSK}</td>
+                        <td class="px-4 py-3"><span class="px-2 py-1 ${statusClass} rounded-full text-xs">${pembimbing.status}</span></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500">Belum ada penetapan pembimbing</td></tr>';
             }
         }
 
@@ -2626,21 +3382,29 @@
             const notifikasi = submissions.notifikasi.dosen[dosen.nama] || [];
             
             if (notifikasi.length > 0) {
-                notifikasiDiv.innerHTML = notifikasi.map(notif => `
-                    <div class="p-4 bg-purple-50 border-l-4 border-purple-400 rounded">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="font-medium text-purple-800">📅 ${notif.message}</p>
-                                <p class="text-sm text-purple-600">Mahasiswa: ${notif.mahasiswa} (${notif.nim})</p>
-                                <p class="text-sm text-purple-600">Tanggal: ${notif.tanggal} - ${notif.waktu}</p>
-                                <p class="text-sm text-purple-600">Ruangan: ${notif.ruangan}</p>
+                notifikasiDiv.innerHTML = notifikasi.map(notif => {
+                    const bgColor = notif.type === 'jadwal_munaqosyah' ? 'bg-indigo-50 border-indigo-400' : 'bg-purple-50 border-purple-400';
+                    const textColor = notif.type === 'jadwal_munaqosyah' ? 'text-indigo-800' : 'text-purple-800';
+                    const textColorLight = notif.type === 'jadwal_munaqosyah' ? 'text-indigo-600' : 'text-purple-600';
+                    const badgeColor = notif.type === 'jadwal_munaqosyah' ? 'bg-indigo-200 text-indigo-800' : 'bg-purple-200 text-purple-800';
+                    const icon = notif.type === 'jadwal_munaqosyah' ? '🎓' : '📅';
+                    
+                    return `
+                        <div class="p-4 ${bgColor} border-l-4 rounded">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="font-medium ${textColor}">${icon} ${notif.message}</p>
+                                    <p class="text-sm ${textColorLight}">Mahasiswa: ${notif.mahasiswa} (${notif.nim})</p>
+                                    <p class="text-sm ${textColorLight}">Tanggal: ${notif.tanggal} - ${notif.waktu}</p>
+                                    <p class="text-sm ${textColorLight}">Ruangan: ${notif.ruangan}</p>
+                                </div>
+                                <span class="px-2 py-1 ${badgeColor} rounded-full text-xs">Baru</span>
                             </div>
-                            <span class="px-2 py-1 bg-purple-200 text-purple-800 rounded-full text-xs">Baru</span>
                         </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             } else {
-                notifikasiDiv.innerHTML = '<p class="text-gray-500 text-sm">Belum ada jadwal seminar yang ditugaskan.</p>';
+                notifikasiDiv.innerHTML = '<p class="text-gray-500 text-sm">Belum ada jadwal yang ditugaskan.</p>';
             }
         }
 
@@ -2682,9 +3446,15 @@
             
             tbody.innerHTML = '';
             
-            submissions.jadwalSeminar.forEach(jadwal => {
+            // Use filtered data if available, otherwise use all data
+            const dataToShow = filteredJadwalSeminar.length > 0 ? filteredJadwalSeminar : submissions.jadwalSeminar;
+            
+            dataToShow.forEach(jadwal => {
                 const row = document.createElement('tr');
+                const checkboxHtml = `<input type="checkbox" class="jadwal-seminar-checkbox" data-id="${jadwal.id}" data-nim="${jadwal.nim}">`;
+                
                 row.innerHTML = `
+                    <td class="px-4 py-3">${checkboxHtml}</td>
                     <td class="px-4 py-3 text-sm">${jadwal.mahasiswa}</td>
                     <td class="px-4 py-3 text-sm">${new Date(jadwal.tanggal).toLocaleString('id-ID')}</td>
                     <td class="px-4 py-3 text-sm">${jadwal.ruangan}</td>
@@ -2695,8 +3465,42 @@
                 tbody.appendChild(row);
             });
             
-            if (submissions.jadwalSeminar.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center text-gray-500">Belum ada jadwal seminar yang dibuat</td></tr>';
+            if (dataToShow.length === 0) {
+                const filterDate = document.getElementById('filterTanggalSeminar')?.value;
+                const message = filterDate ? 'Tidak ada jadwal pada tanggal yang dipilih' : 'Belum ada jadwal seminar yang dibuat';
+                tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500">${message}</td></tr>`;
+            }
+        }
+
+        function updateRekapJadwalMunaqosyah() {
+            const tbody = document.getElementById('rekapJadwalMunaqosyah');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            // Use filtered data if available, otherwise use all data
+            const dataToShow = filteredJadwalMunaqosyah.length > 0 ? filteredJadwalMunaqosyah : submissions.jadwalMunaqosyah;
+            
+            dataToShow.forEach(jadwal => {
+                const row = document.createElement('tr');
+                const checkboxHtml = `<input type="checkbox" class="jadwal-munaqosyah-checkbox" data-id="${jadwal.id}" data-nim="${jadwal.nim}">`;
+                
+                row.innerHTML = `
+                    <td class="px-4 py-3">${checkboxHtml}</td>
+                    <td class="px-4 py-3 text-sm">${jadwal.mahasiswa}</td>
+                    <td class="px-4 py-3 text-sm">${new Date(jadwal.tanggal).toLocaleString('id-ID')}</td>
+                    <td class="px-4 py-3 text-sm">${jadwal.ruangan}</td>
+                    <td class="px-4 py-3 text-sm">${jadwal.penguji1}</td>
+                    <td class="px-4 py-3 text-sm">${jadwal.penguji2}</td>
+                    <td class="px-4 py-3"><span class="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs">${jadwal.status}</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            if (dataToShow.length === 0) {
+                const filterDate = document.getElementById('filterTanggalMunaqosyah')?.value;
+                const message = filterDate ? 'Tidak ada jadwal pada tanggal yang dipilih' : 'Belum ada jadwal munaqosyah yang dibuat';
+                tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500">${message}</td></tr>`;
             }
         }
 
@@ -2707,18 +3511,40 @@
             const notifikasi = submissions.notifikasi.prodi || [];
             
             if (notifikasi.length > 0) {
-                notifikasiDiv.innerHTML = notifikasi.map(notif => `
-                    <div class="p-4 bg-blue-50 border-l-4 border-blue-400 rounded">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <p class="font-medium text-blue-800">📝 ${notif.message}</p>
-                                <p class="text-sm text-blue-600">Mahasiswa: ${notif.nama} (${notif.nim})</p>
-                                <p class="text-sm text-blue-600">Waktu: ${notif.tanggal} - ${notif.waktu}</p>
+                notifikasiDiv.innerHTML = notifikasi.map(notif => {
+                    let icon = '📝';
+                    let bgColor = 'bg-blue-50 border-blue-400';
+                    let textColor = 'text-blue-800';
+                    let textColorLight = 'text-blue-600';
+                    let badgeColor = 'bg-blue-200 text-blue-800';
+                    
+                    if (notif.type === 'pengajuan_munaqosyah') {
+                        icon = '🎓';
+                        bgColor = 'bg-purple-50 border-purple-400';
+                        textColor = 'text-purple-800';
+                        textColorLight = 'text-purple-600';
+                        badgeColor = 'bg-purple-200 text-purple-800';
+                    } else if (notif.type === 'pengajuan_seminar') {
+                        icon = '📋';
+                        bgColor = 'bg-green-50 border-green-400';
+                        textColor = 'text-green-800';
+                        textColorLight = 'text-green-600';
+                        badgeColor = 'bg-green-200 text-green-800';
+                    }
+                    
+                    return `
+                        <div class="p-4 ${bgColor} border-l-4 rounded">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <p class="font-medium ${textColor}">${icon} ${notif.message}</p>
+                                    <p class="text-sm ${textColorLight}">Mahasiswa: ${notif.nama} (${notif.nim})</p>
+                                    <p class="text-sm ${textColorLight}">Waktu: ${notif.tanggal} - ${notif.waktu}</p>
+                                </div>
+                                <span class="px-2 py-1 ${badgeColor} rounded-full text-xs">Baru</span>
                             </div>
-                            <span class="px-2 py-1 bg-blue-200 text-blue-800 rounded-full text-xs">Baru</span>
                         </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             } else {
                 notifikasiDiv.innerHTML = '<p class="text-gray-500 text-sm">Belum ada notifikasi baru.</p>';
             }
@@ -2736,7 +3562,10 @@
                 if (pengajuanMahasiswa.length > 0) {
                     pengajuanMahasiswa.forEach(pengajuan => {
                         const row = document.createElement('tr');
+                        const checkboxHtml = `<input type="checkbox" class="seminar-mhs-checkbox" data-id="${pengajuan.id}" data-nim="${pengajuan.nim}">`;
+                        
                         row.innerHTML = `
+                            <td class="px-4 py-3">${checkboxHtml}</td>
                             <td class="px-4 py-3 text-sm">${pengajuan.nim}</td>
                             <td class="px-4 py-3 text-sm">${pengajuan.nama}</td>
                             <td class="px-4 py-3 text-sm">${pengajuan.tanggalSubmit}</td>
@@ -2745,7 +3574,7 @@
                         tbodyMahasiswa.appendChild(row);
                     });
                 } else {
-                    tbodyMahasiswa.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-gray-500">Belum ada pengajuan seminar proposal</td></tr>';
+                    tbodyMahasiswa.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">Belum ada pengajuan seminar proposal</td></tr>';
                 }
             }
             
@@ -2757,7 +3586,10 @@
                 if (submissions.pengajuanSeminar.length > 0) {
                     submissions.pengajuanSeminar.forEach(pengajuan => {
                         const row = document.createElement('tr');
+                        const checkboxHtml = `<input type="checkbox" class="seminar-checkbox" data-id="${pengajuan.id}" data-nim="${pengajuan.nim}">`;
+                        
                         row.innerHTML = `
+                            <td class="px-4 py-3">${checkboxHtml}</td>
                             <td class="px-4 py-3 text-sm">${pengajuan.nim}</td>
                             <td class="px-4 py-3 text-sm">${pengajuan.nama}</td>
                             <td class="px-4 py-3 text-sm">${pengajuan.tanggalSubmit}</td>
@@ -2766,8 +3598,771 @@
                         tbodyProdi.appendChild(row);
                     });
                 } else {
-                    tbodyProdi.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-gray-500">Belum ada pengajuan seminar proposal</td></tr>';
+                    tbodyProdi.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">Belum ada pengajuan seminar proposal</td></tr>';
                 }
+            }
+        }
+
+        // Function to handle Google Drive link with comprehensive popup blocker solution
+        function openGoogleDrive() {
+            const driveUrl = 'https://drive.google.com/drive/folders/1OUW7LhUaQ20ubFQ6h8zADqGCu5CX21Lh?usp=drive_link';
+            
+            // Show loading indicator
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.innerHTML = '<svg class="w-5 h-5 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" class="opacity-25"></circle><path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" class="opacity-75"></path></svg>Membuka...';
+            button.disabled = true;
+            
+            // Try to open in new window/tab
+            const newWindow = window.open(driveUrl, '_blank', 'noopener,noreferrer');
+            
+            // Reset button after short delay
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }, 2000);
+            
+            // Check if popup was blocked (with delay to ensure proper detection)
+            setTimeout(() => {
+                if (!newWindow || newWindow.closed || typeof newWindow.closed == 'undefined') {
+                    // Popup was blocked, show comprehensive solution
+                    showPopupBlockedSolution(driveUrl);
+                } else {
+                    // Popup opened successfully, show success message briefly
+                    showSuccessMessage();
+                }
+            }, 100);
+        }
+
+        // Show popup blocked solution with multiple options
+        function showPopupBlockedSolution(driveUrl) {
+            const alternativeDiv = document.getElementById('alternativeLink');
+            if (alternativeDiv) {
+                // Update content with comprehensive solution
+                alternativeDiv.innerHTML = `
+                    <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-3 flex-1">
+                                <h3 class="text-sm font-medium text-yellow-800 mb-2">
+                                    Browser memblokir popup - Pilih cara akses:
+                                </h3>
+                                
+                                <!-- Option 1: Direct link -->
+                                <div class="mb-3">
+                                    <button onclick="window.open('${driveUrl}', '_blank')" 
+                                            class="inline-flex items-center px-3 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                        </svg>
+                                        Coba Buka Lagi
+                                    </button>
+                                    <span class="ml-2 text-xs text-yellow-700">(Klik "Izinkan popup" jika muncul)</span>
+                                </div>
+                                
+                                <!-- Option 2: Copy link -->
+                                <div class="mb-3">
+                                    <div class="flex items-center space-x-2">
+                                        <input type="text" value="${driveUrl}" readonly 
+                                               class="flex-1 px-2 py-1 text-xs border border-gray-300 rounded bg-gray-50" 
+                                               id="driveUrlInput">
+                                        <button onclick="copyDriveUrl()" 
+                                                class="px-3 py-1 bg-green-600 text-white text-xs font-medium rounded hover:bg-green-700 transition-colors">
+                                            📋 Copy
+                                        </button>
+                                    </div>
+                                    <p class="text-xs text-yellow-700 mt-1">Copy link dan paste di tab browser baru</p>
+                                </div>
+                                
+                                <!-- Option 3: Same tab -->
+                                <div class="mb-3">
+                                    <button onclick="goToGoogleDrive('${driveUrl}')" 
+                                            class="inline-flex items-center px-3 py-2 bg-orange-600 text-white text-sm font-medium rounded-md hover:bg-orange-700 transition-colors">
+                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                                        </svg>
+                                        Buka di Tab Ini
+                                    </button>
+                                    <span class="ml-2 text-xs text-yellow-700">(Akan meninggalkan halaman ini)</span>
+                                </div>
+                                
+                                <!-- Instructions -->
+                                <div class="mt-3 p-2 bg-blue-50 rounded text-xs text-blue-800">
+                                    <strong>💡 Tips:</strong> Untuk menghindari masalah ini di masa depan, izinkan popup untuk situs ini di pengaturan browser Anda.
+                                </div>
+                                
+                                <!-- Close button -->
+                                <button onclick="hideAlternativeLink()" 
+                                        class="mt-2 text-xs text-yellow-600 hover:text-yellow-800 underline">
+                                    Tutup pesan ini
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                alternativeDiv.classList.remove('hidden');
+                
+                // Auto-hide after 30 seconds (longer time for user to choose)
+                setTimeout(() => {
+                    if (!alternativeDiv.classList.contains('hidden')) {
+                        alternativeDiv.classList.add('hidden');
+                    }
+                }, 30000);
+            }
+        }
+
+        // Show success message when popup opens successfully
+        function showSuccessMessage() {
+            const alternativeDiv = document.getElementById('alternativeLink');
+            if (alternativeDiv) {
+                alternativeDiv.innerHTML = `
+                    <div class="p-3 bg-green-50 border border-green-200 rounded-lg">
+                        <div class="flex items-center">
+                            <svg class="h-5 w-5 text-green-400 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                            </svg>
+                            <span class="text-sm font-medium text-green-800">
+                                ✅ Google Drive berhasil dibuka di tab baru!
+                            </span>
+                        </div>
+                    </div>
+                `;
+                alternativeDiv.classList.remove('hidden');
+                
+                // Auto-hide success message after 3 seconds
+                setTimeout(() => {
+                    alternativeDiv.classList.add('hidden');
+                }, 3000);
+            }
+        }
+
+        // Copy drive URL to clipboard
+        function copyDriveUrl() {
+            const input = document.getElementById('driveUrlInput');
+            if (input) {
+                input.select();
+                input.setSelectionRange(0, 99999); // For mobile devices
+                
+                try {
+                    document.execCommand('copy');
+                    
+                    // Show copy success feedback
+                    const button = event.target;
+                    const originalText = button.textContent;
+                    button.textContent = '✅ Copied!';
+                    button.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    button.classList.add('bg-green-700');
+                    
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.classList.remove('bg-green-700');
+                        button.classList.add('bg-green-600', 'hover:bg-green-700');
+                    }, 2000);
+                    
+                } catch (err) {
+                    // Fallback for browsers that don't support execCommand
+                    if (navigator.clipboard) {
+                        navigator.clipboard.writeText(input.value).then(() => {
+                            const button = event.target;
+                            const originalText = button.textContent;
+                            button.textContent = '✅ Copied!';
+                            setTimeout(() => {
+                                button.textContent = originalText;
+                            }, 2000);
+                        });
+                    } else {
+                        alert('Link copied! Paste di browser: ' + input.value);
+                    }
+                }
+            }
+        }
+
+        // Navigate to Google Drive in same tab
+        function goToGoogleDrive(url) {
+            if (confirm('Anda akan meninggalkan halaman ini dan pergi ke Google Drive. Pastikan Anda sudah menyimpan pekerjaan. Lanjutkan?')) {
+                window.location.href = url;
+            }
+        }
+
+        // Hide alternative link manually
+        function hideAlternativeLink() {
+            const alternativeDiv = document.getElementById('alternativeLink');
+            if (alternativeDiv) {
+                alternativeDiv.classList.add('hidden');
+            }
+        }
+
+        // New functions for delete functionality and filters
+        
+        // Toggle select all functions for different tables
+        function toggleSelectAllSeminar() {
+            const selectAll = document.getElementById('selectAllSeminar');
+            const checkboxes = document.querySelectorAll('.seminar-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+        }
+        
+        function toggleSelectAllJadwalSeminar() {
+            const selectAll = document.getElementById('selectAllJadwalSeminar');
+            const checkboxes = document.querySelectorAll('.jadwal-seminar-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+        }
+        
+        function toggleSelectAllJadwalMunaqosyah() {
+            const selectAll = document.getElementById('selectAllJadwalMunaqosyah');
+            const checkboxes = document.querySelectorAll('.jadwal-munaqosyah-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+        }
+        
+        function toggleSelectAllPembimbing() {
+            const selectAll = document.getElementById('selectAllPembimbing');
+            const checkboxes = document.querySelectorAll('.pembimbing-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+        }
+        
+        function toggleSelectAllBimbingan() {
+            const selectAll = document.getElementById('selectAllBimbingan');
+            const checkboxes = document.querySelectorAll('.bimbingan-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+        }
+        
+        function toggleSelectAllSeminarMhs() {
+            const selectAll = document.getElementById('selectAllSeminarMhs');
+            const checkboxes = document.querySelectorAll('.seminar-mhs-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+        }
+        
+        // Delete selected data function
+        async function hapusDataTerpilih(type) {
+            // Prevent default behavior
+            if (event && event.preventDefault) {
+                event.preventDefault();
+            }
+            
+            let checkboxes, dataArray, collectionName, message, updateFunction;
+            
+            switch(type) {
+                case 'judul':
+                    checkboxes = document.querySelectorAll('.judul-checkbox:checked');
+                    dataArray = submissions.judulSkripsi;
+                    collectionName = 'pengajuan_judul';
+                    message = 'pengajuan judul';
+                    updateFunction = updateJudulValidasiTable;
+                    break;
+                case 'seminar':
+                    checkboxes = document.querySelectorAll('.seminar-checkbox:checked');
+                    dataArray = submissions.pengajuanSeminar;
+                    collectionName = 'pengajuan_seminar';
+                    message = 'pengajuan seminar';
+                    updateFunction = updateRekapPengajuanSeminar;
+                    break;
+                case 'jadwalSeminar':
+                    checkboxes = document.querySelectorAll('.jadwal-seminar-checkbox:checked');
+                    dataArray = submissions.jadwalSeminar;
+                    collectionName = 'jadwal_seminar';
+                    message = 'jadwal seminar';
+                    updateFunction = updateRekapJadwalSeminar;
+                    break;
+                case 'jadwalMunaqosyah':
+                    checkboxes = document.querySelectorAll('.jadwal-munaqosyah-checkbox:checked');
+                    dataArray = submissions.jadwalMunaqosyah;
+                    collectionName = 'jadwal_munaqosyah';
+                    message = 'jadwal munaqosyah';
+                    updateFunction = updateRekapJadwalMunaqosyah;
+                    break;
+                case 'pembimbing':
+                    checkboxes = document.querySelectorAll('.pembimbing-checkbox:checked');
+                    dataArray = submissions.pembimbing;
+                    collectionName = 'penetapan_pembimbing';
+                    message = 'penetapan pembimbing';
+                    updateFunction = updateRekapPembimbingTable;
+                    break;
+                case 'bimbingan':
+                    checkboxes = document.querySelectorAll('.bimbingan-checkbox:checked');
+                    dataArray = submissions.bimbingan;
+                    collectionName = 'bimbingan';
+                    message = 'data bimbingan';
+                    updateFunction = () => updateRiwayatBimbingan(null, selectedMahasiswaFilter);
+                    break;
+                case 'seminarMhs':
+                    checkboxes = document.querySelectorAll('.seminar-mhs-checkbox:checked');
+                    dataArray = submissions.pengajuanSeminar;
+                    collectionName = 'pengajuan_seminar';
+                    message = 'pengajuan seminar';
+                    updateFunction = updateRekapPengajuanSeminar;
+                    break;
+            }
+            
+            if (!checkboxes || checkboxes.length === 0) {
+                alert('Pilih minimal satu data untuk dihapus!');
+                return;
+            }
+            
+            if (!confirm(`Yakin ingin menghapus ${checkboxes.length} ${message} yang dipilih? Data yang dihapus tidak dapat dikembalikan.`)) {
+                return;
+            }
+            
+            // Get selected IDs and NIMs
+            const selectedItems = [];
+            checkboxes.forEach(checkbox => {
+                const id = checkbox.getAttribute('data-id');
+                const nim = checkbox.getAttribute('data-nim');
+                const mahasiswa = checkbox.getAttribute('data-mahasiswa');
+                
+                // Ensure we have valid identifiers
+                if (id || nim || mahasiswa) {
+                    selectedItems.push({ id, nim, mahasiswa });
+                }
+            });
+            
+            if (selectedItems.length === 0) {
+                alert('Tidak ada data valid yang dipilih untuk dihapus!');
+                return;
+            }
+            
+            // Remove from local array with enhanced matching
+            let deletedCount = 0;
+            selectedItems.forEach(item => {
+                let index = -1;
+                
+                // Enhanced matching logic for different data types
+                if (type === 'bimbingan') {
+                    // For bimbingan, try multiple matching strategies
+                    if (item.id && item.id !== 'undefined' && item.id !== 'null') {
+                        index = dataArray.findIndex(d => d.id === item.id);
+                    }
+                    if (index === -1 && item.mahasiswa) {
+                        index = dataArray.findIndex(d => d.mahasiswa === item.mahasiswa);
+                    }
+                } else {
+                    // For other types, prioritize ID matching
+                    if (item.id && item.id !== 'undefined' && item.id !== 'null') {
+                        index = dataArray.findIndex(d => d.id === item.id);
+                    }
+                    // Fallback to NIM matching
+                    if (index === -1 && item.nim) {
+                        index = dataArray.findIndex(d => d.nim === item.nim);
+                    }
+                    // Additional fallback for name matching in some cases
+                    if (index === -1 && item.mahasiswa && (type === 'jadwalSeminar' || type === 'jadwalMunaqosyah')) {
+                        index = dataArray.findIndex(d => d.mahasiswa === item.mahasiswa || d.nama === item.mahasiswa);
+                    }
+                }
+                
+                if (index > -1) {
+                    dataArray.splice(index, 1);
+                    deletedCount++;
+                }
+            });
+            
+            // Save to localStorage as fallback
+            saveLocalData();
+            
+            try {
+                // Remove from Firebase if available
+                for (const item of selectedItems) {
+                    if (item.id && item.id !== 'undefined' && item.id !== 'null' && window.db) {
+                        await window.deleteDoc(window.doc(window.db, collectionName, item.id));
+                    }
+                }
+            } catch (error) {
+                console.log('Firebase error or demo mode - data deleted locally');
+            }
+            
+            alert(`${deletedCount} ${message} berhasil dihapus!`);
+            
+            // Update specific display function
+            if (updateFunction) {
+                updateFunction();
+            }
+            
+            // Also update dashboard stats
+            updateDashboardStats();
+            
+            // Uncheck select all checkboxes
+            const selectAllCheckboxes = [
+                'selectAll',
+                'selectAllSeminar', 
+                'selectAllJadwalSeminar',
+                'selectAllJadwalMunaqosyah',
+                'selectAllPembimbing',
+                'selectAllBimbingan',
+                'selectAllSeminarMhs'
+            ];
+            
+            selectAllCheckboxes.forEach(id => {
+                const checkbox = document.getElementById(id);
+                if (checkbox) checkbox.checked = false;
+            });
+        }
+        
+        // Filter functions for schedule tables
+        let filteredJadwalSeminar = [];
+        let filteredJadwalMunaqosyah = [];
+        
+        function filterJadwalSeminar() {
+            const filterDate = document.getElementById('filterTanggalSeminar').value;
+            if (!filterDate) {
+                filteredJadwalSeminar = [...submissions.jadwalSeminar];
+            } else {
+                const filterDateObj = new Date(filterDate);
+                filteredJadwalSeminar = submissions.jadwalSeminar.filter(jadwal => {
+                    const jadwalDate = new Date(jadwal.tanggal);
+                    return jadwalDate.toDateString() === filterDateObj.toDateString();
+                });
+            }
+            updateRekapJadwalSeminar();
+        }
+        
+        function clearFilterSeminar() {
+            document.getElementById('filterTanggalSeminar').value = '';
+            filteredJadwalSeminar = [...submissions.jadwalSeminar];
+            updateRekapJadwalSeminar();
+        }
+        
+        function filterJadwalMunaqosyah() {
+            const filterDate = document.getElementById('filterTanggalMunaqosyah').value;
+            if (!filterDate) {
+                filteredJadwalMunaqosyah = [...submissions.jadwalMunaqosyah];
+            } else {
+                const filterDateObj = new Date(filterDate);
+                filteredJadwalMunaqosyah = submissions.jadwalMunaqosyah.filter(jadwal => {
+                    const jadwalDate = new Date(jadwal.tanggal);
+                    return jadwalDate.toDateString() === filterDateObj.toDateString();
+                });
+            }
+            updateRekapJadwalMunaqosyah();
+        }
+        
+        function clearFilterMunaqosyah() {
+            document.getElementById('filterTanggalMunaqosyah').value = '';
+            filteredJadwalMunaqosyah = [...submissions.jadwalMunaqosyah];
+            updateRekapJadwalMunaqosyah();
+        }
+        
+        // Print functions for schedules
+        function printJadwalSeminar() {
+            const dataToShow = filteredJadwalSeminar.length > 0 ? filteredJadwalSeminar : submissions.jadwalSeminar;
+            const filterDate = document.getElementById('filterTanggalSeminar').value;
+            const titleSuffix = filterDate ? ` - ${new Date(filterDate).toLocaleDateString('id-ID')}` : '';
+            
+            printSchedule(dataToShow, 'Jadwal Seminar Proposal' + titleSuffix, 'seminar');
+        }
+        
+        function printJadwalMunaqosyah() {
+            const dataToShow = filteredJadwalMunaqosyah.length > 0 ? filteredJadwalMunaqosyah : submissions.jadwalMunaqosyah;
+            const filterDate = document.getElementById('filterTanggalMunaqosyah').value;
+            const titleSuffix = filterDate ? ` - ${new Date(filterDate).toLocaleDateString('id-ID')}` : '';
+            
+            printSchedule(dataToShow, 'Jadwal Sidang Munaqosyah' + titleSuffix, 'munaqosyah');
+        }
+        
+        function printSchedule(scheduleData, title, type) {
+            if (scheduleData.length === 0) {
+                alert('Tidak ada data jadwal untuk dicetak!');
+                return;
+            }
+            
+            const printWindow = window.open('', '_blank');
+            const bgColor = type === 'munaqosyah' ? '#7c3aed' : '#2563eb';
+            
+            let tableRows = '';
+            scheduleData.forEach((jadwal, index) => {
+                tableRows += `
+                    <tr style="border-bottom: 1px solid #ddd;">
+                        <td style="padding: 12px; text-align: center; border-right: 1px solid #ddd;">${index + 1}</td>
+                        <td style="padding: 12px; border-right: 1px solid #ddd;">${jadwal.nama || jadwal.mahasiswa}</td>
+                        <td style="padding: 12px; border-right: 1px solid #ddd;">${jadwal.nim || ''}</td>
+                        <td style="padding: 12px; border-right: 1px solid #ddd;">${new Date(jadwal.tanggal).toLocaleString('id-ID')}</td>
+                        <td style="padding: 12px; border-right: 1px solid #ddd;">${jadwal.ruangan}</td>
+                        <td style="padding: 12px; border-right: 1px solid #ddd;">${jadwal.penguji1}</td>
+                        <td style="padding: 12px;">${jadwal.penguji2}</td>
+                    </tr>
+                `;
+            });
+            
+            const printContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>${title} - STAI Al-Mas'udiyah</title>
+                    <style>
+                        @page {
+                            size: A4 landscape;
+                            margin: 1.5cm;
+                        }
+                        
+                        * {
+                            margin: 0;
+                            padding: 0;
+                            box-sizing: border-box;
+                        }
+                        
+                        body {
+                            font-family: 'Times New Roman', serif;
+                            font-size: 11pt;
+                            line-height: 1.4;
+                            color: #000;
+                            background: white;
+                        }
+                        
+                        .header {
+                            text-align: center;
+                            margin-bottom: 25px;
+                            border-bottom: 2px solid ${bgColor};
+                            padding-bottom: 15px;
+                        }
+                        
+                        .header h1 {
+                            font-size: 16pt;
+                            font-weight: bold;
+                            margin-bottom: 5px;
+                            color: ${bgColor};
+                        }
+                        
+                        .header h2 {
+                            font-size: 14pt;
+                            font-weight: normal;
+                            margin-bottom: 5px;
+                        }
+                        
+                        .header h3 {
+                            font-size: 12pt;
+                            font-weight: bold;
+                            color: ${bgColor};
+                        }
+                        
+                        .schedule-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 20px;
+                            border: 2px solid ${bgColor};
+                        }
+                        
+                        .schedule-table th {
+                            background-color: ${bgColor};
+                            color: white;
+                            padding: 12px 8px;
+                            text-align: center;
+                            font-weight: bold;
+                            border-right: 1px solid white;
+                        }
+                        
+                        .schedule-table th:last-child {
+                            border-right: none;
+                        }
+                        
+                        .schedule-table td {
+                            vertical-align: top;
+                        }
+                        
+                        .footer {
+                            margin-top: 30px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: flex-start;
+                        }
+                        
+                        .signature-box {
+                            text-align: center;
+                            width: 45%;
+                        }
+                        
+                        .signature-line {
+                            border-top: 1px solid #000;
+                            margin-top: 80px;
+                            padding-top: 5px;
+                        }
+                        
+                        .print-info {
+                            margin-top: 20px;
+                            text-align: center;
+                            font-size: 9pt;
+                            color: #666;
+                        }
+                        
+                        @media print {
+                            body {
+                                -webkit-print-color-adjust: exact;
+                                print-color-adjust: exact;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>${title.toUpperCase()}</h1>
+                        <h2>STAI AL-MAS'UDIYAH SUKABUMI</h2>
+                        <h3>TAHUN AKADEMIK 2024/2025</h3>
+                    </div>
+                    
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 5%;">No</th>
+                                <th style="width: 20%;">Nama Mahasiswa</th>
+                                <th style="width: 10%;">NIM</th>
+                                <th style="width: 20%;">Tanggal & Waktu</th>
+                                <th style="width: 10%;">Ruangan</th>
+                                <th style="width: 17.5%;">Penguji 1</th>
+                                <th style="width: 17.5%;">Penguji 2</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows}
+                        </tbody>
+                    </table>
+                    
+                    <div class="footer">
+                        <div class="signature-box">
+                            <p>Mengetahui,</p>
+                            <p style="margin-top: 10px;">Ketua Program Studi</p>
+                            <div class="signature-line">
+                                <p style="font-weight: bold;">Dr. H. Ahmad Syukri, M.Pd.I</p>
+                                <p style="font-size: 9pt;">NIDN. 2108067801</p>
+                            </div>
+                        </div>
+                        <div class="signature-box">
+                            <p>Sukabumi, ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                            <p style="margin-top: 10px;">Koordinator ${type === 'munaqosyah' ? 'Munaqosyah' : 'Seminar'}</p>
+                            <div class="signature-line">
+                                <p style="font-weight: bold;">Dr. H. Muhammad Ridwan, M.Pd.I</p>
+                                <p style="font-size: 9pt;">NIDN. 2108067803</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="print-info">
+                        <p>Dicetak pada: ${new Date().toLocaleString('id-ID')} | Total: ${scheduleData.length} jadwal</p>
+                        <p>Sistem Manajemen Skripsi - STAI Al-Mas'udiyah Sukabumi</p>
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            
+            // Wait for content to load then print
+            printWindow.onload = function() {
+                setTimeout(() => {
+                    printWindow.focus();
+                    printWindow.print();
+                    // Don't auto-close to allow user to save as PDF
+                }, 500);
+            };
+        }
+
+        // Add demo data for testing
+        function addDemoData() {
+            // Demo accounts
+            if (accounts.mahasiswa.length === 0) {
+                accounts.mahasiswa = [
+                    { nim: '2021001', nama: 'Ahmad Fauzi', status: 'aktif' },
+                    { nim: '2021002', nama: 'Siti Nurhaliza', status: 'aktif' },
+                    { nim: '2021003', nama: 'Muhammad Rizki', status: 'aktif' }
+                ];
+            }
+            
+            if (accounts.dosen.length === 0) {
+                accounts.dosen = [
+                    { username: 'dosen1', password: 'dosen123', nama: 'Dr. H. Abdullah, M.Pd.I', status: 'aktif' },
+                    { username: 'dosen2', password: 'dosen123', nama: 'Dr. Hj. Fatimah, M.Ag', status: 'aktif' },
+                    { username: 'dosen3', password: 'dosen123', nama: 'Dr. H. Muhammad Ali, M.Pd.I', status: 'aktif' }
+                ];
+            }
+            
+            if (accounts.prodi.length === 0) {
+                accounts.prodi = [
+                    { username: 'prodi', password: 'prodi123', nama: 'Program Studi PAI', status: 'aktif' }
+                ];
+            }
+            
+            // Demo submissions
+            if (submissions.judulSkripsi.length === 0) {
+                submissions.judulSkripsi = [
+                    {
+                        id: 'judul_1',
+                        nim: '2021001',
+                        nama: 'Ahmad Fauzi',
+                        judul: 'Implementasi Pendidikan Karakter dalam Pembelajaran PAI',
+                        latarBelakang: 'Pentingnya pendidikan karakter di era modern',
+                        status: 'Menunggu',
+                        tanggalPengajuan: new Date().toLocaleDateString('id-ID'),
+                        timestamp: new Date()
+                    }
+                ];
+            }
+            
+            if (submissions.pengajuanSeminar.length === 0) {
+                submissions.pengajuanSeminar = [
+                    {
+                        id: 'seminar_1',
+                        nim: '2021001',
+                        nama: 'Ahmad Fauzi',
+                        tanggalPengajuan: '2025-02-01',
+                        tanggalSubmit: new Date().toLocaleDateString('id-ID'),
+                        catatanProposal: 'Proposal sudah siap untuk diseminarkan',
+                        status: 'Menunggu Penjadwalan',
+                        timestamp: new Date()
+                    }
+                ];
+            }
+            
+            if (submissions.pembimbing.length === 0) {
+                submissions.pembimbing = [
+                    {
+                        id: 'pembimbing_1',
+                        nim: '2021001',
+                        nama: 'Ahmad Fauzi',
+                        nomorSK: 'SK/001/2025',
+                        pembimbing1: 'Dr. H. Abdullah, M.Pd.I',
+                        pembimbing2: 'Dr. Hj. Fatimah, M.Ag',
+                        tanggalSK: new Date().toLocaleDateString('id-ID'),
+                        status: 'Aktif',
+                        timestamp: new Date()
+                    }
+                ];
+            }
+            
+            if (submissions.bimbingan.length === 0) {
+                submissions.bimbingan = [
+                    {
+                        id: 'bimbingan_1',
+                        mahasiswa: 'Ahmad Fauzi (2021001)',
+                        tanggal: '2025-01-15',
+                        materi: 'Pembahasan BAB I - Pendahuluan',
+                        catatan: 'Perbaiki latar belakang masalah',
+                        pembimbing: 'Dr. H. Abdullah, M.Pd.I',
+                        timestamp: new Date()
+                    },
+                    {
+                        id: 'bimbingan_2',
+                        mahasiswa: 'Ahmad Fauzi (2021001)',
+                        tanggal: '2025-01-20',
+                        materi: 'Review BAB II - Landasan Teori',
+                        catatan: 'Tambahkan referensi terbaru',
+                        pembimbing: 'Dr. H. Abdullah, M.Pd.I',
+                        timestamp: new Date()
+                    }
+                ];
             }
         }
 
@@ -2787,9 +4382,16 @@
             navButtons[0].classList.remove('text-gray-600', 'hover:bg-blue-50');
             navButtons[0].classList.add('bg-blue-600', 'text-white');
             
+            // Initialize filter arrays
+            filteredJadwalSeminar = [];
+            filteredJadwalMunaqosyah = [];
+            
+            // Add demo data first
+            addDemoData();
+            
             // Load data from Firebase
             loadData();
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97feaacea676aa1c',t:'MTc1ODAwNzkxOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98012da1351540ec',t:'MTc1ODAzNDI0OC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
