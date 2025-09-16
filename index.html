@@ -1123,13 +1123,19 @@
         // Load all data from Firebase
         async function loadData() {
             try {
-                // Load accounts
+                // Initialize empty data first
+                initializeEmptyData();
+                
+                // Load accounts from Firebase
                 await loadAccounts();
                 
-                // Load submissions
+                // Load submissions from Firebase
                 await loadSubmissions();
                 
-                // Load notifications
+                // Load status skripsi from Firebase
+                await loadStatusSkripsi();
+                
+                // Load notifications from Firebase
                 await loadNotifications();
                 
                 // Update dashboard statistics
@@ -1138,10 +1144,14 @@
                 // Update all tables and displays
                 updateAllDisplays();
                 
-                console.log('Data loaded successfully from Firebase');
+                console.log('All data loaded successfully from Firebase');
             } catch (error) {
-                console.log('Firebase connection error, using local storage fallback');
-                loadLocalData();
+                console.error('Firebase connection error:', error);
+                // Initialize empty data if Firebase fails
+                initializeEmptyData();
+                updateDashboardStats();
+                updateAllDisplays();
+                console.log('Firebase unavailable - starting with empty data');
             }
         }
 
@@ -1199,6 +1209,13 @@
                 submissions.jadwalSeminar.push({ id: doc.id, ...doc.data() });
             });
 
+            // Load jadwal munaqosyah
+            const jadwalMunaqosyahSnapshot = await getDocs(collection(db, 'jadwal_munaqosyah'));
+            submissions.jadwalMunaqosyah = [];
+            jadwalMunaqosyahSnapshot.forEach(doc => {
+                submissions.jadwalMunaqosyah.push({ id: doc.id, ...doc.data() });
+            });
+
             // Load munaqosyah
             const munaqosyahSnapshot = await getDocs(collection(db, 'pengajuan_munaqosyah'));
             submissions.munaqosyah = [];
@@ -1211,6 +1228,15 @@
             submissions.pembimbing = [];
             pembimbingSnapshot.forEach(doc => {
                 submissions.pembimbing.push({ id: doc.id, ...doc.data() });
+            });
+        }
+
+        // Load status skripsi from Firebase
+        async function loadStatusSkripsi() {
+            const statusSnapshot = await getDocs(collection(db, 'status_skripsi'));
+            submissions.statusSkripsi = [];
+            statusSnapshot.forEach(doc => {
+                submissions.statusSkripsi.push({ id: doc.id, ...doc.data() });
             });
         }
 
@@ -1239,27 +1265,8 @@
             });
         }
 
-        // Load data from localStorage as fallback
-        function loadLocalData() {
-            const savedAccounts = localStorage.getItem('skripsi_accounts');
-            const savedSubmissions = localStorage.getItem('skripsi_submissions');
-            
-            if (savedAccounts) {
-                accounts = JSON.parse(savedAccounts);
-            }
-            if (savedSubmissions) {
-                submissions = JSON.parse(savedSubmissions);
-            }
-            
-            updateDashboardStats();
-            updateAllDisplays();
-        }
-
-        // Save data to localStorage
-        function saveLocalData() {
-            localStorage.setItem('skripsi_accounts', JSON.stringify(accounts));
-            localStorage.setItem('skripsi_submissions', JSON.stringify(submissions));
-        }
+        // Firebase-only data management - no localStorage fallback
+        // All data operations now use Firebase exclusively
 
         // Update dashboard statistics
         function updateDashboardStats() {
@@ -2070,21 +2077,19 @@
                 accounts.mahasiswa.push({ id: docRef.id, ...newMahasiswa });
                 
                 alert('Akun mahasiswa berhasil ditambahkan!');
+                
+                // Update displays
+                updateMahasiswaTable();
+                updateDropdownOptions();
+                updateDashboardStats();
+                
+                // Clear form
+                document.getElementById('newNim').value = '';
+                document.getElementById('newNamaMhs').value = '';
             } catch (error) {
-                console.log('Firebase error, saving locally');
-                accounts.mahasiswa.push(newMahasiswa);
-                saveLocalData();
-                alert('Akun mahasiswa berhasil ditambahkan!');
+                console.error('Firebase error:', error);
+                alert('Gagal menambahkan akun mahasiswa. Pastikan koneksi internet stabil.');
             }
-            
-            // Update displays
-            updateMahasiswaTable();
-            updateDropdownOptions();
-            updateDashboardStats();
-            
-            // Clear form
-            document.getElementById('newNim').value = '';
-            document.getElementById('newNamaMhs').value = '';
         }
 
         async function tambahProdi() {
@@ -2118,20 +2123,18 @@
                 accounts.prodi.push({ id: docRef.id, ...newProdi });
                 
                 alert('Akun program studi berhasil ditambahkan!');
+                
+                // Update table
+                updateProdiTable();
+                
+                // Clear form
+                document.getElementById('newUsernameProdi').value = '';
+                document.getElementById('newPasswordProdi').value = '';
+                document.getElementById('newNamaProdi').value = '';
             } catch (error) {
-                console.log('Firebase error, saving locally');
-                accounts.prodi.push(newProdi);
-                saveLocalData();
-                alert('Akun program studi berhasil ditambahkan!');
+                console.error('Firebase error:', error);
+                alert('Gagal menambahkan akun program studi. Pastikan koneksi internet stabil.');
             }
-            
-            // Update table
-            updateProdiTable();
-            
-            // Clear form
-            document.getElementById('newUsernameProdi').value = '';
-            document.getElementById('newPasswordProdi').value = '';
-            document.getElementById('newNamaProdi').value = '';
         }
 
         async function tambahDosen() {
@@ -2165,21 +2168,19 @@
                 accounts.dosen.push({ id: docRef.id, ...newDosen });
                 
                 alert('Akun dosen berhasil ditambahkan!');
+                
+                // Update displays
+                updateDosenTable();
+                updateDropdownOptions();
+                
+                // Clear form
+                document.getElementById('newUsernameDosen').value = '';
+                document.getElementById('newPasswordDosen').value = '';
+                document.getElementById('newNamaDosen').value = '';
             } catch (error) {
-                console.log('Firebase error, saving locally');
-                accounts.dosen.push(newDosen);
-                saveLocalData();
-                alert('Akun dosen berhasil ditambahkan!');
+                console.error('Firebase error:', error);
+                alert('Gagal menambahkan akun dosen. Pastikan koneksi internet stabil.');
             }
-            
-            // Update displays
-            updateDosenTable();
-            updateDropdownOptions();
-            
-            // Clear form
-            document.getElementById('newUsernameDosen').value = '';
-            document.getElementById('newPasswordDosen').value = '';
-            document.getElementById('newNamaDosen').value = '';
         }
 
         // Update table functions
@@ -2261,97 +2262,226 @@
             });
         }
 
-        // Action functions
-        function editMahasiswa(nim) {
+        // Action functions - Firebase exclusive
+        async function editMahasiswa(nim) {
             const mahasiswa = accounts.mahasiswa.find(m => m.nim === nim);
             if (mahasiswa) {
                 const newNama = prompt('Edit nama mahasiswa:', mahasiswa.nama);
                 if (newNama && newNama !== mahasiswa.nama) {
-                    mahasiswa.nama = newNama;
-                    updateMahasiswaTable();
-                    updateDropdownOptions();
-                    alert('Data mahasiswa berhasil diupdate!');
+                    try {
+                        // Update in Firebase
+                        await updateDoc(doc(db, 'accounts_mahasiswa', mahasiswa.id), {
+                            nama: newNama
+                        });
+                        
+                        // Update local data
+                        mahasiswa.nama = newNama;
+                        
+                        updateMahasiswaTable();
+                        updateDropdownOptions();
+                        alert('Data mahasiswa berhasil diupdate!');
+                    } catch (error) {
+                        console.error('Firebase error:', error);
+                        alert('Gagal mengupdate data mahasiswa. Pastikan koneksi internet stabil.');
+                    }
                 }
             }
         }
 
-        function toggleStatusMahasiswa(nim, currentStatus) {
+        async function toggleStatusMahasiswa(nim, currentStatus) {
             const mahasiswa = accounts.mahasiswa.find(m => m.nim === nim);
             if (mahasiswa) {
-                mahasiswa.status = currentStatus === 'aktif' ? 'nonaktif' : 'aktif';
-                updateMahasiswaTable();
-                updateDropdownOptions();
-                alert(`Status mahasiswa berhasil diubah menjadi ${mahasiswa.status}!`);
+                const newStatus = currentStatus === 'aktif' ? 'nonaktif' : 'aktif';
+                
+                try {
+                    // Update in Firebase
+                    await updateDoc(doc(db, 'accounts_mahasiswa', mahasiswa.id), {
+                        status: newStatus
+                    });
+                    
+                    // Update local data
+                    mahasiswa.status = newStatus;
+                    
+                    updateMahasiswaTable();
+                    updateDropdownOptions();
+                    updateDashboardStats();
+                    alert(`Status mahasiswa berhasil diubah menjadi ${newStatus}!`);
+                } catch (error) {
+                    console.error('Firebase error:', error);
+                    alert('Gagal mengubah status mahasiswa. Pastikan koneksi internet stabil.');
+                }
             }
         }
 
-        function hapusMahasiswa(nim) {
+        async function hapusMahasiswa(nim) {
             if (confirm('Yakin ingin menghapus akun mahasiswa ini?')) {
-                accounts.mahasiswa = accounts.mahasiswa.filter(m => m.nim !== nim);
-                updateMahasiswaTable();
-                updateDropdownOptions();
-                alert('Akun mahasiswa berhasil dihapus!');
+                const mahasiswa = accounts.mahasiswa.find(m => m.nim === nim);
+                if (mahasiswa) {
+                    try {
+                        // Delete from Firebase
+                        await deleteDoc(doc(db, 'accounts_mahasiswa', mahasiswa.id));
+                        
+                        // Remove from local data
+                        accounts.mahasiswa = accounts.mahasiswa.filter(m => m.nim !== nim);
+                        
+                        updateMahasiswaTable();
+                        updateDropdownOptions();
+                        updateDashboardStats();
+                        alert('Akun mahasiswa berhasil dihapus!');
+                    } catch (error) {
+                        console.error('Firebase error:', error);
+                        alert('Gagal menghapus akun mahasiswa. Pastikan koneksi internet stabil.');
+                    }
+                }
             }
         }
 
-        function editProdi(username) {
+        async function editProdi(username) {
             const prodi = accounts.prodi.find(p => p.username === username);
             if (prodi) {
                 const newNama = prompt('Edit nama:', prodi.nama);
                 const newPassword = prompt('Edit password:', prodi.password);
-                if (newNama) prodi.nama = newNama;
-                if (newPassword) prodi.password = newPassword;
-                updateProdiTable();
-                alert('Data program studi berhasil diupdate!');
+                
+                if (newNama || newPassword) {
+                    try {
+                        const updateData = {};
+                        if (newNama) updateData.nama = newNama;
+                        if (newPassword) updateData.password = newPassword;
+                        
+                        // Update in Firebase
+                        await updateDoc(doc(db, 'accounts_prodi', prodi.id), updateData);
+                        
+                        // Update local data
+                        if (newNama) prodi.nama = newNama;
+                        if (newPassword) prodi.password = newPassword;
+                        
+                        updateProdiTable();
+                        alert('Data program studi berhasil diupdate!');
+                    } catch (error) {
+                        console.error('Firebase error:', error);
+                        alert('Gagal mengupdate data program studi. Pastikan koneksi internet stabil.');
+                    }
+                }
             }
         }
 
-        function toggleStatusProdi(username, currentStatus) {
+        async function toggleStatusProdi(username, currentStatus) {
             const prodi = accounts.prodi.find(p => p.username === username);
             if (prodi) {
-                prodi.status = currentStatus === 'aktif' ? 'nonaktif' : 'aktif';
-                updateProdiTable();
-                alert(`Status akun berhasil diubah menjadi ${prodi.status}!`);
+                const newStatus = currentStatus === 'aktif' ? 'nonaktif' : 'aktif';
+                
+                try {
+                    // Update in Firebase
+                    await updateDoc(doc(db, 'accounts_prodi', prodi.id), {
+                        status: newStatus
+                    });
+                    
+                    // Update local data
+                    prodi.status = newStatus;
+                    
+                    updateProdiTable();
+                    alert(`Status akun berhasil diubah menjadi ${newStatus}!`);
+                } catch (error) {
+                    console.error('Firebase error:', error);
+                    alert('Gagal mengubah status akun. Pastikan koneksi internet stabil.');
+                }
             }
         }
 
-        function hapusProdi(username) {
+        async function hapusProdi(username) {
             if (confirm('Yakin ingin menghapus akun program studi ini?')) {
-                accounts.prodi = accounts.prodi.filter(p => p.username !== username);
-                updateProdiTable();
-                alert('Akun program studi berhasil dihapus!');
+                const prodi = accounts.prodi.find(p => p.username === username);
+                if (prodi) {
+                    try {
+                        // Delete from Firebase
+                        await deleteDoc(doc(db, 'accounts_prodi', prodi.id));
+                        
+                        // Remove from local data
+                        accounts.prodi = accounts.prodi.filter(p => p.username !== username);
+                        
+                        updateProdiTable();
+                        alert('Akun program studi berhasil dihapus!');
+                    } catch (error) {
+                        console.error('Firebase error:', error);
+                        alert('Gagal menghapus akun program studi. Pastikan koneksi internet stabil.');
+                    }
+                }
             }
         }
 
-        function editDosen(username) {
+        async function editDosen(username) {
             const dosen = accounts.dosen.find(d => d.username === username);
             if (dosen) {
                 const newNama = prompt('Edit nama:', dosen.nama);
                 const newPassword = prompt('Edit password:', dosen.password);
-                if (newNama) dosen.nama = newNama;
-                if (newPassword) dosen.password = newPassword;
-                updateDosenTable();
-                updateDropdownOptions();
-                alert('Data dosen berhasil diupdate!');
+                
+                if (newNama || newPassword) {
+                    try {
+                        const updateData = {};
+                        if (newNama) updateData.nama = newNama;
+                        if (newPassword) updateData.password = newPassword;
+                        
+                        // Update in Firebase
+                        await updateDoc(doc(db, 'accounts_dosen', dosen.id), updateData);
+                        
+                        // Update local data
+                        if (newNama) dosen.nama = newNama;
+                        if (newPassword) dosen.password = newPassword;
+                        
+                        updateDosenTable();
+                        updateDropdownOptions();
+                        alert('Data dosen berhasil diupdate!');
+                    } catch (error) {
+                        console.error('Firebase error:', error);
+                        alert('Gagal mengupdate data dosen. Pastikan koneksi internet stabil.');
+                    }
+                }
             }
         }
 
-        function toggleStatusDosen(username, currentStatus) {
+        async function toggleStatusDosen(username, currentStatus) {
             const dosen = accounts.dosen.find(d => d.username === username);
             if (dosen) {
-                dosen.status = currentStatus === 'aktif' ? 'nonaktif' : 'aktif';
-                updateDosenTable();
-                updateDropdownOptions();
-                alert(`Status akun berhasil diubah menjadi ${dosen.status}!`);
+                const newStatus = currentStatus === 'aktif' ? 'nonaktif' : 'aktif';
+                
+                try {
+                    // Update in Firebase
+                    await updateDoc(doc(db, 'accounts_dosen', dosen.id), {
+                        status: newStatus
+                    });
+                    
+                    // Update local data
+                    dosen.status = newStatus;
+                    
+                    updateDosenTable();
+                    updateDropdownOptions();
+                    alert(`Status akun berhasil diubah menjadi ${newStatus}!`);
+                } catch (error) {
+                    console.error('Firebase error:', error);
+                    alert('Gagal mengubah status akun. Pastikan koneksi internet stabil.');
+                }
             }
         }
 
-        function hapusDosen(username) {
+        async function hapusDosen(username) {
             if (confirm('Yakin ingin menghapus akun dosen ini?')) {
-                accounts.dosen = accounts.dosen.filter(d => d.username !== username);
-                updateDosenTable();
-                updateDropdownOptions();
-                alert('Akun dosen berhasil dihapus!');
+                const dosen = accounts.dosen.find(d => d.username === username);
+                if (dosen) {
+                    try {
+                        // Delete from Firebase
+                        await deleteDoc(doc(db, 'accounts_dosen', dosen.id));
+                        
+                        // Remove from local data
+                        accounts.dosen = accounts.dosen.filter(d => d.username !== username);
+                        
+                        updateDosenTable();
+                        updateDropdownOptions();
+                        alert('Akun dosen berhasil dihapus!');
+                    } catch (error) {
+                        console.error('Firebase error:', error);
+                        alert('Gagal menghapus akun dosen. Pastikan koneksi internet stabil.');
+                    }
+                }
             }
         }
 
@@ -2488,11 +2618,14 @@
                     tanggalPengajuan: new Date().toISOString(),
                     timestamp: new Date()
                 });
+                
+                alert('Judul skripsi berhasil diajukan! Menunggu validasi dari Program Studi.');
             } catch (error) {
-                console.log('Demo mode - data saved locally');
+                console.error('Firebase error:', error);
+                alert('Gagal mengajukan judul skripsi. Pastikan koneksi internet stabil.');
+                return;
             }
             
-            alert('Judul skripsi berhasil diajukan! Menunggu validasi dari Program Studi.');
             form.reset();
             
             // Update status display
@@ -2565,8 +2698,9 @@
                 
                 alert('Pengajuan seminar proposal berhasil disubmit! Menunggu penjadwalan dari Program Studi.');
             } catch (error) {
-                console.log('Demo mode - data saved locally');
-                alert('Pengajuan seminar proposal berhasil disubmit! Menunggu penjadwalan dari Program Studi.');
+                console.error('Firebase error:', error);
+                alert('Gagal mengajukan seminar proposal. Pastikan koneksi internet stabil.');
+                return;
             }
             
             // Clear form
@@ -2644,9 +2778,9 @@
                 
                 alert('Pengajuan sidang munaqosyah berhasil disubmit! Menunggu penjadwalan dari Program Studi.');
             } catch (error) {
-                console.log('Demo mode - data saved locally');
-                saveLocalData();
-                alert('Pengajuan sidang munaqosyah berhasil disubmit! Menunggu penjadwalan dari Program Studi.');
+                console.error('Firebase error:', error);
+                alert('Gagal mengajukan sidang munaqosyah. Pastikan koneksi internet stabil.');
+                return;
             }
             
             form.reset();
@@ -2655,7 +2789,7 @@
             updateProdiNotifications();
         }
 
-        // Program Studi functions
+        // Program Studi functions - Firebase exclusive
         async function validasiJudul(status, docId) {
             // Prevent default behavior
             if (event && event.preventDefault) {
@@ -2692,31 +2826,8 @@
             const nim = row.querySelector('td:nth-child(2)').textContent;
             const nama = row.querySelector('td:nth-child(3)').textContent;
             
-            // Update local storage
-            const submission = submissions.judulSkripsi.find(s => s.id === docId || s.nim === nim);
-            if (submission) {
-                submission.status = statusText;
-                submission.tanggalValidasi = new Date().toLocaleDateString('id-ID');
-                submission.validator = 'Program Studi';
-                submission.catatan = catatan;
-            }
-            
-            // Add notification for mahasiswa
-            if (!submissions.notifikasi.mahasiswa[nim]) {
-                submissions.notifikasi.mahasiswa[nim] = [];
-            }
-            submissions.notifikasi.mahasiswa[nim].push({
-                id: Date.now().toString(),
-                type: 'validasi_judul',
-                status: statusText,
-                message: `Judul skripsi Anda ${statusText.toLowerCase()}`,
-                catatan: catatan,
-                tanggal: new Date().toLocaleDateString('id-ID'),
-                waktu: new Date().toLocaleTimeString('id-ID')
-            });
-            
             try {
-                // Save to Firebase
+                // Update in Firebase
                 await updateDoc(doc(db, 'pengajuan_judul', docId), {
                     status: statusText,
                     tanggalValidasi: new Date().toISOString(),
@@ -2734,22 +2845,47 @@
                     catatan: catatan,
                     timestamp: new Date()
                 });
+                
+                // Update local storage
+                const submission = submissions.judulSkripsi.find(s => s.id === docId || s.nim === nim);
+                if (submission) {
+                    submission.status = statusText;
+                    submission.tanggalValidasi = new Date().toLocaleDateString('id-ID');
+                    submission.validator = 'Program Studi';
+                    submission.catatan = catatan;
+                }
+                
+                // Add notification for mahasiswa locally
+                if (!submissions.notifikasi.mahasiswa[nim]) {
+                    submissions.notifikasi.mahasiswa[nim] = [];
+                }
+                submissions.notifikasi.mahasiswa[nim].push({
+                    id: Date.now().toString(),
+                    type: 'validasi_judul',
+                    status: statusText,
+                    message: `Judul skripsi Anda ${statusText.toLowerCase()}`,
+                    catatan: catatan,
+                    tanggal: new Date().toLocaleDateString('id-ID'),
+                    waktu: new Date().toLocaleTimeString('id-ID')
+                });
+                
+                alert(message);
+                
+                // Update table status
+                const statusCell = row.querySelector('td:nth-child(4)');
+                statusCell.innerHTML = `<span class="px-2 py-1 ${statusClass} rounded-full text-xs">${statusText}</span>`;
+                
+                // Update action buttons
+                const actionCell = row.querySelector('td:nth-child(5)');
+                actionCell.innerHTML = `<span class="text-gray-500 text-xs">Sudah divalidasi</span>`;
+                
+                // Update mahasiswa notifications if logged in
+                updateMahasiswaNotifications();
+                
             } catch (error) {
-                console.log('Demo mode - validation saved locally');
+                console.error('Firebase error:', error);
+                alert('Gagal memvalidasi judul. Pastikan koneksi internet stabil.');
             }
-            
-            alert(message);
-            
-            // Update table status
-            const statusCell = row.querySelector('td:nth-child(4)');
-            statusCell.innerHTML = `<span class="px-2 py-1 ${statusClass} rounded-full text-xs">${statusText}</span>`;
-            
-            // Update action buttons
-            const actionCell = row.querySelector('td:nth-child(5)');
-            actionCell.innerHTML = `<span class="text-gray-500 text-xs">Sudah divalidasi</span>`;
-            
-            // Update mahasiswa notifications if logged in
-            updateMahasiswaNotifications();
         }
 
         // Checkbox functions
@@ -2943,11 +3079,14 @@
                     penguji2: penguji2,
                     timestamp: new Date()
                 });
+                
+                alert(`Jadwal seminar proposal berhasil dibuat!\n\nMahasiswa: ${mahasiswa}\nTanggal: ${new Date(tanggal).toLocaleString('id-ID')}\nRuangan: ${ruangan}\nPenguji 1: ${penguji1}\nPenguji 2: ${penguji2}\n\nNotifikasi telah dikirim ke mahasiswa dan dosen penguji.`);
             } catch (error) {
-                console.log('Demo mode - jadwal saved locally');
+                console.error('Firebase error:', error);
+                alert('Gagal membuat jadwal seminar. Pastikan koneksi internet stabil.');
+                return;
             }
             
-            alert(`Jadwal seminar proposal berhasil dibuat!\n\nMahasiswa: ${mahasiswa}\nTanggal: ${new Date(tanggal).toLocaleString('id-ID')}\nRuangan: ${ruangan}\nPenguji 1: ${penguji1}\nPenguji 2: ${penguji2}\n\nNotifikasi telah dikirim ke mahasiswa dan dosen penguji.`);
             form.reset();
             
             // Update rekapitulasi table
@@ -3088,12 +3227,13 @@
             try {
                 // Save to Firebase
                 await addDoc(collection(db, 'penetapan_pembimbing'), pembimbingBaru);
+                
+                alert(`SK Pembimbing berhasil diterbitkan!\n\nNomor SK: ${nomorSK}\nMahasiswa: ${nama} (${nim})\nPembimbing 1: ${pembimbing1}\nPembimbing 2: ${pembimbing2}\n\nDokumen akan dikirim ke dosen pembimbing.`);
             } catch (error) {
-                console.log('Demo mode - data saved locally');
-                saveLocalData();
+                console.error('Firebase error:', error);
+                alert('Gagal menerbitkan SK Pembimbing. Pastikan koneksi internet stabil.');
+                return;
             }
-            
-            alert(`SK Pembimbing berhasil diterbitkan!\n\nNomor SK: ${nomorSK}\nMahasiswa: ${nama} (${nim})\nPembimbing 1: ${pembimbing1}\nPembimbing 2: ${pembimbing2}\n\nDokumen akan dikirim ke dosen pembimbing.`);
             
             // Clear form
             document.getElementById('mahasiswaSearchInput').value = '';
@@ -3120,7 +3260,7 @@
             }
         });
 
-        // Dosen functions
+        // Dosen functions - Firebase exclusive
         async function tandatanganiForm(nim) {
             // Prevent default behavior
             if (event && event.preventDefault) {
@@ -3130,26 +3270,31 @@
             // Find submission and update approval status
             const submission = submissions.judulSkripsi.find(s => s.nim === nim);
             if (submission) {
-                submission.dosenWaliApproval = true;
-                submission.tanggalPersetujuanDosen = new Date().toLocaleDateString('id-ID');
-                
                 try {
-                    // Update in Firebase if available
+                    // Update in Firebase
                     if (submission.id) {
                         await updateDoc(doc(db, 'pengajuan_judul', submission.id), {
                             dosenWaliApproval: true,
                             tanggalPersetujuanDosen: new Date().toISOString()
                         });
+                        
+                        // Update local data
+                        submission.dosenWaliApproval = true;
+                        submission.tanggalPersetujuanDosen = new Date().toLocaleDateString('id-ID');
+                        
+                        alert('Form pengajuan judul berhasil ditandatangani!');
+                        
+                        // Update table display
+                        updatePersetujuanDosenTable();
+                    } else {
+                        alert('ID submission tidak ditemukan!');
                     }
                 } catch (error) {
-                    console.log('Demo mode - approval saved locally');
-                    saveLocalData();
+                    console.error('Firebase error:', error);
+                    alert('Gagal menandatangani form. Pastikan koneksi internet stabil.');
                 }
-                
-                alert('Form pengajuan judul berhasil ditandatangani!');
-                
-                // Update table display
-                updatePersetujuanDosenTable();
+            } else {
+                alert('Submission tidak ditemukan!');
             }
         }
 
@@ -3190,12 +3335,13 @@
             
             try {
                 await addDoc(collection(db, 'bimbingan'), newBimbingan);
+                
+                alert('Data bimbingan berhasil disimpan!');
             } catch (error) {
-                console.log('Demo mode - data saved locally');
-                saveLocalData();
+                console.error('Firebase error:', error);
+                alert('Gagal menyimpan data bimbingan. Pastikan koneksi internet stabil.');
+                return;
             }
-            
-            alert('Data bimbingan berhasil disimpan!');
             form.reset();
             
             // Auto-select the mahasiswa in filter if not already selected
@@ -3288,7 +3434,7 @@
             updateFilterDropdownOptions();
         }
 
-        // Munaqosyah scheduling function
+        // Munaqosyah scheduling function - Firebase exclusive
         async function buatJadwalMunaqosyah() {
             // Prevent default form submission
             if (event && event.preventDefault) {
@@ -3313,7 +3459,6 @@
             
             // Create jadwal object
             const jadwalBaru = {
-                id: Date.now().toString(),
                 mahasiswa: mahasiswa,
                 nim: nim,
                 nama: nama,
@@ -3322,49 +3467,16 @@
                 penguji1: penguji1,
                 penguji2: penguji2,
                 status: 'Terjadwal',
-                tanggalBuat: new Date().toLocaleDateString('id-ID')
+                tanggalBuat: new Date().toLocaleDateString('id-ID'),
+                timestamp: new Date()
             };
-            
-            // Add to local storage
-            submissions.jadwalMunaqosyah.push(jadwalBaru);
-            
-            // Add notification for mahasiswa
-            if (!submissions.notifikasi.mahasiswa[nim]) {
-                submissions.notifikasi.mahasiswa[nim] = [];
-            }
-            submissions.notifikasi.mahasiswa[nim].push({
-                id: Date.now().toString(),
-                type: 'jadwal_munaqosyah',
-                message: 'Jadwal sidang munaqosyah Anda telah ditetapkan',
-                tanggal: new Date(tanggal).toLocaleDateString('id-ID'),
-                waktu: new Date(tanggal).toLocaleTimeString('id-ID'),
-                ruangan: ruangan,
-                penguji1: penguji1,
-                penguji2: penguji2,
-                tanggalNotif: new Date().toLocaleDateString('id-ID')
-            });
-            
-            // Add notification for dosen
-            [penguji1, penguji2].forEach(dosen => {
-                if (!submissions.notifikasi.dosen[dosen]) {
-                    submissions.notifikasi.dosen[dosen] = [];
-                }
-                submissions.notifikasi.dosen[dosen].push({
-                    id: Date.now().toString() + dosen,
-                    type: 'jadwal_munaqosyah',
-                    message: `Anda ditugaskan sebagai penguji sidang munaqosyah`,
-                    mahasiswa: nama,
-                    nim: nim,
-                    tanggal: new Date(tanggal).toLocaleDateString('id-ID'),
-                    waktu: new Date(tanggal).toLocaleTimeString('id-ID'),
-                    ruangan: ruangan,
-                    tanggalNotif: new Date().toLocaleDateString('id-ID')
-                });
-            });
             
             try {
                 // Save to Firebase
-                await addDoc(collection(db, 'jadwal_munaqosyah'), jadwalBaru);
+                const docRef = await addDoc(collection(db, 'jadwal_munaqosyah'), jadwalBaru);
+                
+                // Add to local storage with Firebase ID
+                submissions.jadwalMunaqosyah.push({ id: docRef.id, ...jadwalBaru });
                 
                 // Save notifications to Firebase
                 await addDoc(collection(db, 'notifikasi'), {
@@ -3379,26 +3491,76 @@
                     penguji2: penguji2,
                     timestamp: new Date()
                 });
+                
+                // Save dosen notifications to Firebase
+                for (const dosen of [penguji1, penguji2]) {
+                    await addDoc(collection(db, 'notifikasi'), {
+                        dosen: dosen,
+                        type: 'jadwal_munaqosyah',
+                        message: `Anda ditugaskan sebagai penguji sidang munaqosyah`,
+                        mahasiswa: nama,
+                        nim: nim,
+                        tanggal: new Date(tanggal).toLocaleDateString('id-ID'),
+                        waktu: new Date(tanggal).toLocaleTimeString('id-ID'),
+                        ruangan: ruangan,
+                        timestamp: new Date()
+                    });
+                }
+                
+                // Add notification for mahasiswa locally
+                if (!submissions.notifikasi.mahasiswa[nim]) {
+                    submissions.notifikasi.mahasiswa[nim] = [];
+                }
+                submissions.notifikasi.mahasiswa[nim].push({
+                    id: Date.now().toString(),
+                    type: 'jadwal_munaqosyah',
+                    message: 'Jadwal sidang munaqosyah Anda telah ditetapkan',
+                    tanggal: new Date(tanggal).toLocaleDateString('id-ID'),
+                    waktu: new Date(tanggal).toLocaleTimeString('id-ID'),
+                    ruangan: ruangan,
+                    penguji1: penguji1,
+                    penguji2: penguji2,
+                    tanggalNotif: new Date().toLocaleDateString('id-ID')
+                });
+                
+                // Add notification for dosen locally
+                [penguji1, penguji2].forEach(dosen => {
+                    if (!submissions.notifikasi.dosen[dosen]) {
+                        submissions.notifikasi.dosen[dosen] = [];
+                    }
+                    submissions.notifikasi.dosen[dosen].push({
+                        id: Date.now().toString() + dosen,
+                        type: 'jadwal_munaqosyah',
+                        message: `Anda ditugaskan sebagai penguji sidang munaqosyah`,
+                        mahasiswa: nama,
+                        nim: nim,
+                        tanggal: new Date(tanggal).toLocaleDateString('id-ID'),
+                        waktu: new Date(tanggal).toLocaleTimeString('id-ID'),
+                        ruangan: ruangan,
+                        tanggalNotif: new Date().toLocaleDateString('id-ID')
+                    });
+                });
+                
+                alert(`Jadwal sidang munaqosyah berhasil dibuat!\n\nMahasiswa: ${mahasiswa}\nTanggal: ${new Date(tanggal).toLocaleString('id-ID')}\nRuangan: ${ruangan}\nPenguji 1: ${penguji1}\nPenguji 2: ${penguji2}\n\nNotifikasi telah dikirim ke mahasiswa dan dosen penguji.`);
+                
+                // Clear form
+                document.getElementById('munaqosyahMahasiswaSelect').value = '';
+                document.getElementById('munaqosyahDateTime').value = '';
+                document.getElementById('munaqosyahRuangan').value = '';
+                document.getElementById('munaqosyahPenguji1').value = '';
+                document.getElementById('munaqosyahPenguji2').value = '';
+                
+                // Update rekapitulasi table
+                updateRekapJadwalMunaqosyah();
+                
+                // Update notifications
+                updateMahasiswaNotifications();
+                updateDosenNotifications();
+                
             } catch (error) {
-                console.log('Demo mode - jadwal saved locally');
-                saveLocalData();
+                console.error('Firebase error:', error);
+                alert('Gagal membuat jadwal munaqosyah. Pastikan koneksi internet stabil.');
             }
-            
-            alert(`Jadwal sidang munaqosyah berhasil dibuat!\n\nMahasiswa: ${mahasiswa}\nTanggal: ${new Date(tanggal).toLocaleString('id-ID')}\nRuangan: ${ruangan}\nPenguji 1: ${penguji1}\nPenguji 2: ${penguji2}\n\nNotifikasi telah dikirim ke mahasiswa dan dosen penguji.`);
-            
-            // Clear form
-            document.getElementById('munaqosyahMahasiswaSelect').value = '';
-            document.getElementById('munaqosyahDateTime').value = '';
-            document.getElementById('munaqosyahRuangan').value = '';
-            document.getElementById('munaqosyahPenguji1').value = '';
-            document.getElementById('munaqosyahPenguji2').value = '';
-            
-            // Update rekapitulasi table
-            updateRekapJadwalMunaqosyah();
-            
-            // Update notifications
-            updateMahasiswaNotifications();
-            updateDosenNotifications();
         }
 
         // Update filter dropdown options for riwayat bimbingan
@@ -3981,7 +4143,7 @@
             });
         }
         
-        // Delete selected data function
+        // Delete selected data function - Firebase exclusive
         async function hapusDataTerpilih(type) {
             // Prevent default behavior
             if (event && event.preventDefault) {
@@ -4069,56 +4231,75 @@
                 return;
             }
             
-            // Remove from local array with enhanced matching
             let deletedCount = 0;
-            selectedItems.forEach(item => {
-                let index = -1;
-                
-                // Enhanced matching logic for different data types
-                if (type === 'bimbingan') {
-                    // For bimbingan, try multiple matching strategies
-                    if (item.id && item.id !== 'undefined' && item.id !== 'null') {
-                        index = dataArray.findIndex(d => d.id === item.id);
-                    }
-                    if (index === -1 && item.mahasiswa) {
-                        index = dataArray.findIndex(d => d.mahasiswa === item.mahasiswa);
-                    }
-                } else {
-                    // For other types, prioritize ID matching
-                    if (item.id && item.id !== 'undefined' && item.id !== 'null') {
-                        index = dataArray.findIndex(d => d.id === item.id);
-                    }
-                    // Fallback to NIM matching
-                    if (index === -1 && item.nim) {
-                        index = dataArray.findIndex(d => d.nim === item.nim);
-                    }
-                    // Additional fallback for name matching in some cases
-                    if (index === -1 && item.mahasiswa && (type === 'jadwalSeminar' || type === 'jadwalMunaqosyah')) {
-                        index = dataArray.findIndex(d => d.mahasiswa === item.mahasiswa || d.nama === item.mahasiswa);
-                    }
-                }
-                
-                if (index > -1) {
-                    dataArray.splice(index, 1);
-                    deletedCount++;
-                }
-            });
-            
-            // Save to localStorage as fallback
-            saveLocalData();
+            let firebaseErrors = 0;
             
             try {
-                // Remove from Firebase if available
+                // Remove from Firebase and local array
                 for (const item of selectedItems) {
-                    if (item.id && item.id !== 'undefined' && item.id !== 'null' && window.db) {
-                        await window.deleteDoc(window.doc(window.db, collectionName, item.id));
+                    let index = -1;
+                    let firebaseId = null;
+                    
+                    // Enhanced matching logic for different data types
+                    if (type === 'bimbingan') {
+                        // For bimbingan, try multiple matching strategies
+                        if (item.id && item.id !== 'undefined' && item.id !== 'null') {
+                            index = dataArray.findIndex(d => d.id === item.id);
+                            firebaseId = item.id;
+                        }
+                        if (index === -1 && item.mahasiswa) {
+                            index = dataArray.findIndex(d => d.mahasiswa === item.mahasiswa);
+                            if (index > -1) firebaseId = dataArray[index].id;
+                        }
+                    } else {
+                        // For other types, prioritize ID matching
+                        if (item.id && item.id !== 'undefined' && item.id !== 'null') {
+                            index = dataArray.findIndex(d => d.id === item.id);
+                            firebaseId = item.id;
+                        }
+                        // Fallback to NIM matching
+                        if (index === -1 && item.nim) {
+                            index = dataArray.findIndex(d => d.nim === item.nim);
+                            if (index > -1) firebaseId = dataArray[index].id;
+                        }
+                        // Additional fallback for name matching in some cases
+                        if (index === -1 && item.mahasiswa && (type === 'jadwalSeminar' || type === 'jadwalMunaqosyah')) {
+                            index = dataArray.findIndex(d => d.mahasiswa === item.mahasiswa || d.nama === item.mahasiswa);
+                            if (index > -1) firebaseId = dataArray[index].id;
+                        }
+                    }
+                    
+                    if (index > -1) {
+                        try {
+                            // Delete from Firebase if we have a valid ID
+                            if (firebaseId && firebaseId !== 'undefined' && firebaseId !== 'null') {
+                                await deleteDoc(doc(db, collectionName, firebaseId));
+                            }
+                            
+                            // Remove from local array
+                            dataArray.splice(index, 1);
+                            deletedCount++;
+                        } catch (firebaseError) {
+                            console.error('Firebase delete error:', firebaseError);
+                            firebaseErrors++;
+                            
+                            // Still remove from local array even if Firebase fails
+                            dataArray.splice(index, 1);
+                            deletedCount++;
+                        }
                     }
                 }
+                
+                let alertMessage = `${deletedCount} ${message} berhasil dihapus!`;
+                if (firebaseErrors > 0) {
+                    alertMessage += `\n\nCatatan: ${firebaseErrors} data gagal dihapus dari server, namun sudah dihapus dari tampilan lokal.`;
+                }
+                alert(alertMessage);
+                
             } catch (error) {
-                console.log('Firebase error or demo mode - data deleted locally');
+                console.error('General delete error:', error);
+                alert(`Terjadi kesalahan saat menghapus data. ${deletedCount} data berhasil dihapus dari ${selectedItems.length} yang dipilih.`);
             }
-            
-            alert(`${deletedCount} ${message} berhasil dihapus!`);
             
             // Update specific display function
             if (updateFunction) {
@@ -4550,126 +4731,25 @@
             });
         }
 
-        // Add demo data for testing
-        function addDemoData() {
-            // Demo accounts
-            if (accounts.mahasiswa.length === 0) {
-                accounts.mahasiswa = [
-                    { nim: '2021001', nama: 'Ahmad Fauzi', status: 'aktif' },
-                    { nim: '2021002', nama: 'Siti Nurhaliza', status: 'aktif' },
-                    { nim: '2021003', nama: 'Muhammad Rizki', status: 'aktif' }
-                ];
-            }
+        // Initialize empty data structure - all data from Firebase
+        function initializeEmptyData() {
+            // Initialize empty arrays - data will be loaded from Firebase
+            accounts.mahasiswa = [];
+            accounts.prodi = [];
+            accounts.dosen = [];
             
-            if (accounts.dosen.length === 0) {
-                accounts.dosen = [
-                    { username: 'dosen1', password: 'dosen123', nama: 'Dr. H. Abdullah, M.Pd.I', status: 'aktif' },
-                    { username: 'dosen2', password: 'dosen123', nama: 'Dr. Hj. Fatimah, M.Ag', status: 'aktif' },
-                    { username: 'dosen3', password: 'dosen123', nama: 'Dr. H. Muhammad Ali, M.Pd.I', status: 'aktif' }
-                ];
-            }
-            
-            if (accounts.prodi.length === 0) {
-                accounts.prodi = [
-                    { username: 'prodi', password: 'prodi123', nama: 'Program Studi PAI', status: 'aktif' }
-                ];
-            }
-            
-            // Demo submissions
-            if (submissions.judulSkripsi.length === 0) {
-                submissions.judulSkripsi = [
-                    {
-                        id: 'judul_1',
-                        nim: '2021001',
-                        nama: 'Ahmad Fauzi',
-                        judul: 'Implementasi Pendidikan Karakter dalam Pembelajaran PAI',
-                        latarBelakang: 'Pentingnya pendidikan karakter di era modern',
-                        status: 'Menunggu',
-                        tanggalPengajuan: new Date().toLocaleDateString('id-ID'),
-                        timestamp: new Date()
-                    }
-                ];
-            }
-            
-            if (submissions.pengajuanSeminar.length === 0) {
-                submissions.pengajuanSeminar = [
-                    {
-                        id: 'seminar_1',
-                        nim: '2021001',
-                        nama: 'Ahmad Fauzi',
-                        tanggalPengajuan: '2025-02-01',
-                        tanggalSubmit: new Date().toLocaleDateString('id-ID'),
-                        catatanProposal: 'Proposal sudah siap untuk diseminarkan',
-                        status: 'Menunggu Penjadwalan',
-                        timestamp: new Date()
-                    }
-                ];
-            }
-            
-            if (submissions.pembimbing.length === 0) {
-                submissions.pembimbing = [
-                    {
-                        id: 'pembimbing_1',
-                        nim: '2021001',
-                        nama: 'Ahmad Fauzi',
-                        nomorSK: 'SK/001/2025',
-                        pembimbing1: 'Dr. H. Abdullah, M.Pd.I',
-                        pembimbing2: 'Dr. Hj. Fatimah, M.Ag',
-                        tanggalSK: new Date().toLocaleDateString('id-ID'),
-                        status: 'Aktif',
-                        timestamp: new Date()
-                    }
-                ];
-            }
-            
-            if (submissions.bimbingan.length === 0) {
-                submissions.bimbingan = [
-                    {
-                        id: 'bimbingan_1',
-                        mahasiswa: 'Ahmad Fauzi (2021001)',
-                        tanggal: '2025-01-15',
-                        materi: 'Pembahasan BAB I - Pendahuluan',
-                        catatan: 'Perbaiki latar belakang masalah',
-                        pembimbing: 'Dr. H. Abdullah, M.Pd.I',
-                        timestamp: new Date()
-                    },
-                    {
-                        id: 'bimbingan_2',
-                        mahasiswa: 'Ahmad Fauzi (2021001)',
-                        tanggal: '2025-01-20',
-                        materi: 'Review BAB II - Landasan Teori',
-                        catatan: 'Tambahkan referensi terbaru',
-                        pembimbing: 'Dr. H. Abdullah, M.Pd.I',
-                        timestamp: new Date()
-                    }
-                ];
-            }
-            
-            if (submissions.statusSkripsi.length === 0) {
-                submissions.statusSkripsi = [
-                    {
-                        id: 'status_1',
-                        nim: '2021001',
-                        nama: 'Ahmad Fauzi',
-                        status: 'Dalam Proses',
-                        catatan: 'Sedang menyelesaikan BAB III',
-                        tanggalUpdate: new Date().toLocaleDateString('id-ID'),
-                        timestamp: new Date()
-                    },
-                    {
-                        id: 'status_2',
-                        nim: '2021002',
-                        nama: 'Siti Nurhaliza',
-                        status: 'Selesai',
-                        catatan: 'Lulus dengan nilai A',
-                        tanggalUpdate: new Date().toLocaleDateString('id-ID'),
-                        timestamp: new Date()
-                    }
-                ];
-            }
+            submissions.judulSkripsi = [];
+            submissions.pengajuanSeminar = [];
+            submissions.pembimbing = [];
+            submissions.bimbingan = [];
+            submissions.statusSkripsi = [];
+            submissions.jadwalSeminar = [];
+            submissions.jadwalMunaqosyah = [];
+            submissions.munaqosyah = [];
+            submissions.notifikasi = { mahasiswa: {}, dosen: {}, prodi: [] };
         }
 
-        // Initialize page
+        // Initialize page - Firebase exclusive
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize without triggering events
             const pages = document.querySelectorAll('.page-content');
@@ -4689,12 +4769,9 @@
             filteredJadwalSeminar = [];
             filteredJadwalMunaqosyah = [];
             
-            // Add demo data first
-            addDemoData();
-            
-            // Load data from Firebase
+            // Load data from Firebase only - no demo data
             loadData();
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98014440614897fb',t:'MTc1ODAzNTE3NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98015d50b78c40a4',t:'MTc1ODAzNjIwMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
