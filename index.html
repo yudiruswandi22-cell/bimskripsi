@@ -103,6 +103,7 @@
                 <button onclick="showPage('mahasiswa')" class="nav-btn px-4 py-2 rounded-lg font-medium transition-colors text-gray-600 hover:bg-blue-50">Mahasiswa</button>
                 <button onclick="showPage('prodi')" class="nav-btn px-4 py-2 rounded-lg font-medium transition-colors text-gray-600 hover:bg-blue-50">Program Studi</button>
                 <button onclick="showPage('dosen')" class="nav-btn px-4 py-2 rounded-lg font-medium transition-colors text-gray-600 hover:bg-blue-50">Dosen</button>
+                <button onclick="showPage('daftarJudulSkripsi')" class="nav-btn px-4 py-2 rounded-lg font-medium transition-colors text-indigo-600 hover:bg-indigo-50">Daftar Judul Skripsi</button>
                 <button onclick="showPage('manajemen')" class="nav-btn px-4 py-2 rounded-lg font-medium transition-colors text-gray-600 hover:bg-blue-50">Manajemen</button>
             </div>
         </div>
@@ -606,6 +607,10 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">Nomor SK</label>
                         <input type="text" id="nomorSKInput" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="SK/001/2025">
                     </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Judul Skripsi</label>
+                        <textarea id="judulSkripsiPembimbing" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-20" placeholder="Masukkan judul skripsi mahasiswa"></textarea>
+                    </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Pembimbing 1</label>
                         <select id="pembimbing1Select" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
@@ -641,6 +646,7 @@
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Pilih</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">NIM</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Nama Mahasiswa</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Judul Skripsi</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Nomor SK</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Pembimbing 1</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Pembimbing 2</th>
@@ -672,6 +678,10 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Ruangan</label>
                         <input type="text" id="munaqosyahRuangan" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Ruang 201">
+                    </div>
+                    <div class="md:col-span-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Judul Skripsi</label>
+                        <textarea id="judulSkripsiMunaqosyah" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-20" placeholder="Masukkan judul skripsi mahasiswa"></textarea>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Penguji 1</label>
@@ -779,6 +789,7 @@
                             <tr class="bg-gray-50">
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Pilih</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Mahasiswa</th>
+                                <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Judul Skripsi</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Tanggal & Waktu</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Ruangan</th>
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Penguji 1</th>
@@ -920,6 +931,183 @@
                     </div>
                 </div>
             </div>
+            </div>
+        </div>
+
+        <!-- Daftar Judul Skripsi Page -->
+        <div id="daftarJudulSkripsi" class="page-content hidden">
+            <!-- Login Form Daftar Judul Skripsi -->
+            <div id="loginDaftarJudulSkripsi" class="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8">
+                <div class="text-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Login Daftar Judul Skripsi</h2>
+                    <p class="text-gray-600 mt-2">Masukkan username dan password</p>
+                </div>
+                <form class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Username</label>
+                        <input type="text" id="usernameDaftarJudulSkripsi" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Masukkan username">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                        <input type="password" id="passwordDaftarJudulSkripsi" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Masukkan password">
+                    </div>
+                    <button type="button" onclick="loginDaftarJudulSkripsi()" class="w-full bg-indigo-600 text-white py-3 px-4 rounded-lg hover:bg-indigo-700 transition-colors font-medium">Masuk Portal</button>
+                </form>
+            </div>
+
+            <!-- Portal Daftar Judul Skripsi Content -->
+            <div id="portalDaftarJudulSkripsi" class="hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Portal Daftar Judul Skripsi</h2>
+                    <div class="flex items-center space-x-4">
+                        <span id="welcomeDaftarJudulSkripsi" class="text-gray-600"></span>
+                        <button onclick="logoutDaftarJudulSkripsi()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm">Logout</button>
+                    </div>
+                </div>
+
+                <!-- Panel Input Judul Skripsi -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">📝 Input Judul Skripsi</h3>
+                    <form class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tahun</label>
+                            <select id="tahunSkripsi" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">Pilih Tahun</option>
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                                <option value="2027">2027</option>
+                                <option value="2028">2028</option>
+                                <option value="2029">2029</option>
+                                <option value="2030">2030</option>
+                                <option value="2031">2031</option>
+                                <option value="2032">2032</option>
+                                <option value="2033">2033</option>
+                                <option value="2034">2034</option>
+                                <option value="2035">2035</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">NIM</label>
+                            <input type="text" id="nimSkripsi" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Masukkan NIM">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Nama Mahasiswa</label>
+                            <input type="text" id="namaMahasiswaSkripsi" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Masukkan nama mahasiswa">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Program Studi</label>
+                            <select id="prodiSkripsi" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">Pilih Program Studi</option>
+                                <option value="PAI">PAI (Pendidikan Agama Islam)</option>
+                                <option value="HES (M)">HES (M) (Hukum Ekonomi Syariah Muamalah)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Pembimbing 1</label>
+                            <select id="pembimbing1Skripsi" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">Pilih Pembimbing 1</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Pembimbing 2</label>
+                            <select id="pembimbing2Skripsi" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">Pilih Pembimbing 2</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Penguji 1</label>
+                            <select id="penguji1Skripsi" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">Pilih Penguji 1</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Penguji 2</label>
+                            <select id="penguji2Skripsi" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="">Pilih Penguji 2</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Judul Skripsi</label>
+                            <textarea id="judulSkripsiInput" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 h-24" placeholder="Masukkan judul skripsi lengkap"></textarea>
+                        </div>
+                        <div class="md:col-span-2">
+                            <button type="button" onclick="simpanJudulSkripsi()" class="bg-indigo-600 text-white py-2 px-6 rounded-lg hover:bg-indigo-700 transition-colors">Simpan Judul Skripsi</button>
+                            <button type="button" onclick="clearFormJudulSkripsi()" class="ml-2 bg-gray-600 text-white py-2 px-6 rounded-lg hover:bg-gray-700 transition-colors">Clear Form</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Panel Rekapitulasi Judul Skripsi -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">📊 Rekapitulasi Judul Skripsi</h3>
+                    
+                    <!-- Filter Controls -->
+                    <div class="mb-4 flex items-center space-x-4 flex-wrap gap-2">
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm font-medium text-gray-700">Cari Judul:</label>
+                            <input type="text" id="searchJudulSkripsi" onkeyup="filterJudulSkripsi()" class="px-3 py-1 border border-gray-300 rounded text-sm w-64" placeholder="Ketik judul skripsi untuk mencari...">
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm font-medium text-gray-700">Filter Program Studi:</label>
+                            <select id="filterProdiSkripsi" onchange="filterJudulSkripsi()" class="px-3 py-1 border border-gray-300 rounded text-sm">
+                                <option value="">Semua Program Studi</option>
+                                <option value="PAI">PAI</option>
+                                <option value="HES (M)">HES (M)</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <label class="text-sm font-medium text-gray-700">Filter Tahun:</label>
+                            <select id="filterTahunSkripsi" onchange="filterJudulSkripsi()" class="px-3 py-1 border border-gray-300 rounded text-sm">
+                                <option value="">Semua Tahun</option>
+                                <option value="2024">2024</option>
+                                <option value="2025">2025</option>
+                                <option value="2026">2026</option>
+                                <option value="2027">2027</option>
+                                <option value="2028">2028</option>
+                                <option value="2029">2029</option>
+                                <option value="2030">2030</option>
+                                <option value="2031">2031</option>
+                                <option value="2032">2032</option>
+                                <option value="2033">2033</option>
+                                <option value="2034">2034</option>
+                                <option value="2035">2035</option>
+                            </select>
+                        </div>
+                        <button onclick="clearFilterJudulSkripsi()" class="px-3 py-1 bg-gray-500 text-white rounded text-sm hover:bg-gray-600">Clear Filter</button>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="selectAllJudulSkripsi" onchange="toggleSelectAllJudulSkripsi()" class="mr-2">
+                            <span class="text-sm font-medium text-gray-700">Pilih Semua</span>
+                        </label>
+                        <button onclick="editDataTerpilih('judulSkripsi')" class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 text-sm">EDIT DATA</button>
+                        <button onclick="hapusDataTerpilih('judulSkripsi')" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm">HAPUS DATA</button>
+                        <button onclick="printJudulSkripsi()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 text-sm">🖨️ PRINT DAFTAR</button>
+                    </div>
+                    
+                    <!-- Table -->
+                    <div class="overflow-x-auto overflow-y-auto max-h-96 border border-gray-200 rounded-lg">
+                        <table class="w-full table-auto">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Pilih</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Tahun</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">NIM</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Nama</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Prodi</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Pembimbing 1</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Pembimbing 2</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Penguji 1</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Penguji 2</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Judul Skripsi</th>
+                                    <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rekapJudulSkripsiTable" class="divide-y divide-gray-200">
+                                <!-- Data akan muncul di sini -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1135,6 +1323,9 @@
                 // Load status skripsi from Firebase
                 await loadStatusSkripsi();
                 
+                // Load daftar judul skripsi from Firebase
+                await loadDaftarJudulSkripsi();
+                
                 // Load notifications from Firebase
                 await loadNotifications();
                 
@@ -1240,6 +1431,15 @@
             });
         }
 
+        // Load daftar judul skripsi from Firebase
+        async function loadDaftarJudulSkripsi() {
+            const daftarJudulSnapshot = await getDocs(collection(db, 'daftar_judul_skripsi'));
+            submissions.daftarJudulSkripsi = [];
+            daftarJudulSnapshot.forEach(doc => {
+                submissions.daftarJudulSkripsi.push({ id: doc.id, ...doc.data() });
+            });
+        }
+
         // Load notifications from Firebase
         async function loadNotifications() {
             const notifikasiSnapshot = await getDocs(collection(db, 'notifikasi'));
@@ -1301,6 +1501,8 @@
             updatePersetujuanDosenTable();
             updateRekapStatusSkripsi();
             updateStatusDropdownOptions();
+            updateDaftarJudulSkripsiDropdowns();
+            updateRekapJudulSkripsiTable();
         }
         
         function updateJudulTable(snapshot) {
@@ -1807,6 +2009,7 @@
             munaqosyah: [],
             pembimbing: [],
             statusSkripsi: [], // New: untuk menyimpan status skripsi mahasiswa
+            daftarJudulSkripsi: [], // New: untuk menyimpan daftar judul skripsi
             notifikasi: {
                 mahasiswa: {},
                 dosen: {},
@@ -1985,6 +2188,41 @@
             document.getElementById('portalDosen').classList.add('hidden');
             document.getElementById('usernameDosen').value = '';
             document.getElementById('passwordDosen').value = '';
+        }
+
+        // Daftar Judul Skripsi login functions
+        function loginDaftarJudulSkripsi() {
+            const username = document.getElementById('usernameDaftarJudulSkripsi').value;
+            const password = document.getElementById('passwordDaftarJudulSkripsi').value;
+            
+            if (!username || !password) {
+                alert('Mohon masukkan username dan password!');
+                return;
+            }
+            
+            // Admin credentials
+            if (username === 'admin' && password === 'admin') {
+                // Create new session
+                createSession('daftarJudulSkripsi', username, { username: username, nama: 'Administrator' });
+                
+                document.getElementById('loginDaftarJudulSkripsi').classList.add('hidden');
+                document.getElementById('portalDaftarJudulSkripsi').classList.remove('hidden');
+                document.getElementById('welcomeDaftarJudulSkripsi').textContent = `Selamat datang, Administrator`;
+                
+                // Update dropdowns and table
+                updateDaftarJudulSkripsiDropdowns();
+                updateRekapJudulSkripsiTable();
+            } else {
+                alert('Username atau password salah! (admin/admin)');
+            }
+        }
+        
+        function logoutDaftarJudulSkripsi() {
+            clearSession('daftarJudulSkripsi');
+            document.getElementById('loginDaftarJudulSkripsi').classList.remove('hidden');
+            document.getElementById('portalDaftarJudulSkripsi').classList.add('hidden');
+            document.getElementById('usernameDaftarJudulSkripsi').value = '';
+            document.getElementById('passwordDaftarJudulSkripsi').value = '';
         }
 
         // Manajemen login functions
@@ -2551,6 +2789,17 @@
                 } else {
                     document.getElementById('loginDosen').classList.remove('hidden');
                     document.getElementById('portalDosen').classList.add('hidden');
+                }
+            } else if (pageId === 'daftarJudulSkripsi') {
+                if (validateSession('daftarJudulSkripsi')) {
+                    document.getElementById('loginDaftarJudulSkripsi').classList.add('hidden');
+                    document.getElementById('portalDaftarJudulSkripsi').classList.remove('hidden');
+                    document.getElementById('welcomeDaftarJudulSkripsi').textContent = `Selamat datang, Administrator`;
+                    updateDaftarJudulSkripsiDropdowns();
+                    updateRekapJudulSkripsiTable();
+                } else {
+                    document.getElementById('loginDaftarJudulSkripsi').classList.remove('hidden');
+                    document.getElementById('portalDaftarJudulSkripsi').classList.add('hidden');
                 }
             } else if (pageId === 'manajemen') {
                 if (validateSession('manajemen')) {
@@ -3193,10 +3442,11 @@
             const nim = document.getElementById('selectedMahasiswaNim').value;
             const nama = document.getElementById('selectedMahasiswaNama').value;
             const nomorSK = document.getElementById('nomorSKInput').value;
+            const judulSkripsi = document.getElementById('judulSkripsiPembimbing').value;
             const pembimbing1 = document.getElementById('pembimbing1Select').value;
             const pembimbing2 = document.getElementById('pembimbing2Select').value;
             
-            if (!nim || !nama || !nomorSK || !pembimbing1 || !pembimbing2) {
+            if (!nim || !nama || !nomorSK || !judulSkripsi || !pembimbing1 || !pembimbing2) {
                 alert('Mohon lengkapi semua field!');
                 return;
             }
@@ -3213,6 +3463,7 @@
                 id: Date.now().toString(),
                 nim: nim,
                 nama: nama,
+                judulSkripsi: judulSkripsi,
                 nomorSK: nomorSK,
                 pembimbing1: pembimbing1,
                 pembimbing2: pembimbing2,
@@ -3228,7 +3479,7 @@
                 // Save to Firebase
                 await addDoc(collection(db, 'penetapan_pembimbing'), pembimbingBaru);
                 
-                alert(`SK Pembimbing berhasil diterbitkan!\n\nNomor SK: ${nomorSK}\nMahasiswa: ${nama} (${nim})\nPembimbing 1: ${pembimbing1}\nPembimbing 2: ${pembimbing2}\n\nDokumen akan dikirim ke dosen pembimbing.`);
+                alert(`SK Pembimbing berhasil diterbitkan!\n\nNomor SK: ${nomorSK}\nMahasiswa: ${nama} (${nim})\nJudul Skripsi: ${judulSkripsi}\nPembimbing 1: ${pembimbing1}\nPembimbing 2: ${pembimbing2}\n\nDokumen akan dikirim ke dosen pembimbing.`);
             } catch (error) {
                 console.error('Firebase error:', error);
                 alert('Gagal menerbitkan SK Pembimbing. Pastikan koneksi internet stabil.');
@@ -3240,6 +3491,7 @@
             document.getElementById('selectedMahasiswaNim').value = '';
             document.getElementById('selectedMahasiswaNama').value = '';
             document.getElementById('nomorSKInput').value = '';
+            document.getElementById('judulSkripsiPembimbing').value = '';
             document.getElementById('pembimbing1Select').value = '';
             document.getElementById('pembimbing2Select').value = '';
             
@@ -3444,10 +3696,11 @@
             const mahasiswa = document.getElementById('munaqosyahMahasiswaSelect').value;
             const tanggal = document.getElementById('munaqosyahDateTime').value;
             const ruangan = document.getElementById('munaqosyahRuangan').value;
+            const judulSkripsi = document.getElementById('judulSkripsiMunaqosyah').value;
             const penguji1 = document.getElementById('munaqosyahPenguji1').value;
             const penguji2 = document.getElementById('munaqosyahPenguji2').value;
             
-            if (!mahasiswa || !tanggal || !ruangan || !penguji1 || !penguji2) {
+            if (!mahasiswa || !tanggal || !ruangan || !judulSkripsi || !penguji1 || !penguji2) {
                 alert('Mohon lengkapi semua field!');
                 return;
             }
@@ -3462,6 +3715,7 @@
                 mahasiswa: mahasiswa,
                 nim: nim,
                 nama: nama,
+                judulSkripsi: judulSkripsi,
                 tanggal: tanggal,
                 ruangan: ruangan,
                 penguji1: penguji1,
@@ -3541,12 +3795,13 @@
                     });
                 });
                 
-                alert(`Jadwal sidang munaqosyah berhasil dibuat!\n\nMahasiswa: ${mahasiswa}\nTanggal: ${new Date(tanggal).toLocaleString('id-ID')}\nRuangan: ${ruangan}\nPenguji 1: ${penguji1}\nPenguji 2: ${penguji2}\n\nNotifikasi telah dikirim ke mahasiswa dan dosen penguji.`);
+                alert(`Jadwal sidang munaqosyah berhasil dibuat!\n\nMahasiswa: ${mahasiswa}\nJudul Skripsi: ${judulSkripsi}\nTanggal: ${new Date(tanggal).toLocaleString('id-ID')}\nRuangan: ${ruangan}\nPenguji 1: ${penguji1}\nPenguji 2: ${penguji2}\n\nNotifikasi telah dikirim ke mahasiswa dan dosen penguji.`);
                 
                 // Clear form
                 document.getElementById('munaqosyahMahasiswaSelect').value = '';
                 document.getElementById('munaqosyahDateTime').value = '';
                 document.getElementById('munaqosyahRuangan').value = '';
+                document.getElementById('judulSkripsiMunaqosyah').value = '';
                 document.getElementById('munaqosyahPenguji1').value = '';
                 document.getElementById('munaqosyahPenguji2').value = '';
                 
@@ -3593,11 +3848,13 @@
                     const row = document.createElement('tr');
                     const statusClass = pembimbing.status === 'Aktif' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
                     const checkboxHtml = `<input type="checkbox" class="pembimbing-checkbox" data-id="${pembimbing.id}" data-nim="${pembimbing.nim}">`;
+                    const judulSkripsi = pembimbing.judulSkripsi || '-';
                     
                     row.innerHTML = `
                         <td class="px-4 py-3">${checkboxHtml}</td>
                         <td class="px-4 py-3 text-sm">${pembimbing.nim}</td>
                         <td class="px-4 py-3 text-sm">${pembimbing.nama}</td>
+                        <td class="px-4 py-3 text-sm" title="${judulSkripsi}">${judulSkripsi.length > 50 ? judulSkripsi.substring(0, 50) + '...' : judulSkripsi}</td>
                         <td class="px-4 py-3 text-sm">${pembimbing.nomorSK}</td>
                         <td class="px-4 py-3 text-sm">${pembimbing.pembimbing1}</td>
                         <td class="px-4 py-3 text-sm">${pembimbing.pembimbing2}</td>
@@ -3607,7 +3864,7 @@
                     tbody.appendChild(row);
                 });
             } else {
-                tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500">Belum ada penetapan pembimbing</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center text-gray-500">Belum ada penetapan pembimbing</td></tr>';
             }
         }
 
@@ -3779,10 +4036,12 @@
             dataToShow.forEach(jadwal => {
                 const row = document.createElement('tr');
                 const checkboxHtml = `<input type="checkbox" class="jadwal-munaqosyah-checkbox" data-id="${jadwal.id}" data-nim="${jadwal.nim}">`;
+                const judulSkripsi = jadwal.judulSkripsi || '-';
                 
                 row.innerHTML = `
                     <td class="px-4 py-3">${checkboxHtml}</td>
                     <td class="px-4 py-3 text-sm">${jadwal.mahasiswa}</td>
+                    <td class="px-4 py-3 text-sm" title="${judulSkripsi}">${judulSkripsi.length > 40 ? judulSkripsi.substring(0, 40) + '...' : judulSkripsi}</td>
                     <td class="px-4 py-3 text-sm">${new Date(jadwal.tanggal).toLocaleString('id-ID')}</td>
                     <td class="px-4 py-3 text-sm">${jadwal.ruangan}</td>
                     <td class="px-4 py-3 text-sm">${jadwal.penguji1}</td>
@@ -3795,7 +4054,7 @@
             if (dataToShow.length === 0) {
                 const filterDate = document.getElementById('filterTanggalMunaqosyah')?.value;
                 const message = filterDate ? 'Tidak ada jadwal pada tanggal yang dipilih' : 'Belum ada jadwal munaqosyah yang dibuat';
-                tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500">${message}</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="px-4 py-8 text-center text-gray-500">${message}</td></tr>`;
             }
         }
 
@@ -4143,6 +4402,41 @@
             });
         }
         
+        // Edit selected data function for judul skripsi
+        function editDataTerpilih(type) {
+            // Prevent default behavior
+            if (event && event.preventDefault) {
+                event.preventDefault();
+            }
+            
+            if (type === 'judulSkripsi') {
+                const checkboxes = document.querySelectorAll('.judul-skripsi-checkbox:checked');
+                
+                if (checkboxes.length === 0) {
+                    alert('Pilih satu data untuk diedit!');
+                    return;
+                }
+                
+                if (checkboxes.length > 1) {
+                    alert('Pilih hanya satu data untuk diedit!');
+                    return;
+                }
+                
+                const checkbox = checkboxes[0];
+                const id = checkbox.getAttribute('data-id');
+                
+                if (id) {
+                    editJudulSkripsi(id);
+                    
+                    // Uncheck the checkbox
+                    checkbox.checked = false;
+                    document.getElementById('selectAllJudulSkripsi').checked = false;
+                } else {
+                    alert('ID data tidak ditemukan!');
+                }
+            }
+        }
+
         // Delete selected data function - Firebase exclusive
         async function hapusDataTerpilih(type) {
             // Prevent default behavior
@@ -4201,6 +4495,13 @@
                     collectionName = 'pengajuan_seminar';
                     message = 'pengajuan seminar';
                     updateFunction = updateRekapPengajuanSeminar;
+                    break;
+                case 'judulSkripsi':
+                    checkboxes = document.querySelectorAll('.judul-skripsi-checkbox:checked');
+                    dataArray = submissions.daftarJudulSkripsi;
+                    collectionName = 'daftar_judul_skripsi';
+                    message = 'judul skripsi';
+                    updateFunction = updateRekapJudulSkripsiTable;
                     break;
             }
             
@@ -4317,7 +4618,8 @@
                 'selectAllJadwalMunaqosyah',
                 'selectAllPembimbing',
                 'selectAllBimbingan',
-                'selectAllSeminarMhs'
+                'selectAllSeminarMhs',
+                'selectAllJudulSkripsi'
             ];
             
             selectAllCheckboxes.forEach(id => {
@@ -4731,6 +5033,470 @@
             });
         }
 
+        // Daftar Judul Skripsi Functions
+        let currentEditingId = null;
+        let filteredDaftarJudulSkripsi = [];
+
+        async function simpanJudulSkripsi() {
+            // Prevent default form submission
+            if (event && event.preventDefault) {
+                event.preventDefault();
+            }
+            
+            const tahun = document.getElementById('tahunSkripsi').value;
+            const nim = document.getElementById('nimSkripsi').value;
+            const nama = document.getElementById('namaMahasiswaSkripsi').value;
+            const prodi = document.getElementById('prodiSkripsi').value;
+            const pembimbing1 = document.getElementById('pembimbing1Skripsi').value;
+            const pembimbing2 = document.getElementById('pembimbing2Skripsi').value;
+            const penguji1 = document.getElementById('penguji1Skripsi').value;
+            const penguji2 = document.getElementById('penguji2Skripsi').value;
+            const judul = document.getElementById('judulSkripsiInput').value;
+            
+            if (!tahun || !nim || !nama || !prodi || !pembimbing1 || !pembimbing2 || !penguji1 || !penguji2 || !judul) {
+                alert('Mohon lengkapi semua field!');
+                return;
+            }
+            
+            // Check if NIM already exists (except when editing)
+            const existingIndex = submissions.daftarJudulSkripsi.findIndex(s => s.nim === nim);
+            if (existingIndex >= 0 && (!currentEditingId || submissions.daftarJudulSkripsi[existingIndex].id !== currentEditingId)) {
+                alert('NIM sudah terdaftar dalam daftar judul skripsi!');
+                return;
+            }
+            
+            const judulSkripsiData = {
+                id: currentEditingId || Date.now().toString(),
+                tahun: tahun,
+                nim: nim,
+                nama: nama,
+                prodi: prodi,
+                pembimbing1: pembimbing1,
+                pembimbing2: pembimbing2,
+                penguji1: penguji1,
+                penguji2: penguji2,
+                judul: judul,
+                tanggalInput: new Date().toLocaleDateString('id-ID'),
+                timestamp: new Date()
+            };
+            
+            try {
+                if (currentEditingId) {
+                    // Update existing data
+                    await updateDoc(doc(db, 'daftar_judul_skripsi', currentEditingId), judulSkripsiData);
+                    
+                    // Update local data
+                    const index = submissions.daftarJudulSkripsi.findIndex(s => s.id === currentEditingId);
+                    if (index >= 0) {
+                        submissions.daftarJudulSkripsi[index] = judulSkripsiData;
+                    }
+                    
+                    alert('Data judul skripsi berhasil diupdate!');
+                    currentEditingId = null;
+                } else {
+                    // Add new data
+                    const docRef = await addDoc(collection(db, 'daftar_judul_skripsi'), judulSkripsiData);
+                    
+                    // Add to local data with Firebase ID
+                    submissions.daftarJudulSkripsi.push({ id: docRef.id, ...judulSkripsiData });
+                    
+                    alert('Data judul skripsi berhasil disimpan!');
+                }
+                
+                // Clear form and update table
+                clearFormJudulSkripsi();
+                updateRekapJudulSkripsiTable();
+                
+            } catch (error) {
+                console.error('Firebase error:', error);
+                alert('Gagal menyimpan data judul skripsi. Pastikan koneksi internet stabil.');
+            }
+        }
+
+        function clearFormJudulSkripsi() {
+            document.getElementById('tahunSkripsi').value = '';
+            document.getElementById('nimSkripsi').value = '';
+            document.getElementById('namaMahasiswaSkripsi').value = '';
+            document.getElementById('prodiSkripsi').value = '';
+            document.getElementById('pembimbing1Skripsi').value = '';
+            document.getElementById('pembimbing2Skripsi').value = '';
+            document.getElementById('penguji1Skripsi').value = '';
+            document.getElementById('penguji2Skripsi').value = '';
+            document.getElementById('judulSkripsiInput').value = '';
+            currentEditingId = null;
+            
+            // Update button text
+            const saveButton = document.querySelector('button[onclick="simpanJudulSkripsi()"]');
+            if (saveButton) {
+                saveButton.textContent = 'Simpan Judul Skripsi';
+                saveButton.className = 'bg-indigo-600 text-white py-2 px-6 rounded-lg hover:bg-indigo-700 transition-colors';
+            }
+        }
+
+        function editJudulSkripsi(id) {
+            const data = submissions.daftarJudulSkripsi.find(s => s.id === id);
+            if (!data) {
+                alert('Data tidak ditemukan!');
+                return;
+            }
+            
+            // Fill form with existing data
+            document.getElementById('tahunSkripsi').value = data.tahun;
+            document.getElementById('nimSkripsi').value = data.nim;
+            document.getElementById('namaMahasiswaSkripsi').value = data.nama;
+            document.getElementById('prodiSkripsi').value = data.prodi;
+            document.getElementById('pembimbing1Skripsi').value = data.pembimbing1;
+            document.getElementById('pembimbing2Skripsi').value = data.pembimbing2;
+            document.getElementById('penguji1Skripsi').value = data.penguji1;
+            document.getElementById('penguji2Skripsi').value = data.penguji2;
+            document.getElementById('judulSkripsiInput').value = data.judul;
+            
+            currentEditingId = id;
+            
+            // Update button text
+            const saveButton = document.querySelector('button[onclick="simpanJudulSkripsi()"]');
+            if (saveButton) {
+                saveButton.textContent = 'Update Judul Skripsi';
+                saveButton.className = 'bg-yellow-600 text-white py-2 px-6 rounded-lg hover:bg-yellow-700 transition-colors';
+            }
+            
+            // Scroll to form
+            document.querySelector('.bg-white.rounded-xl.shadow-lg.p-6.mb-6').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function updateDaftarJudulSkripsiDropdowns() {
+            // Update dosen dropdowns
+            const dosenSelects = [
+                'pembimbing1Skripsi', 'pembimbing2Skripsi', 
+                'penguji1Skripsi', 'penguji2Skripsi'
+            ];
+            
+            dosenSelects.forEach(selectId => {
+                const select = document.getElementById(selectId);
+                if (select) {
+                    const currentValue = select.value;
+                    let placeholder = 'Pilih Dosen';
+                    if (selectId.includes('pembimbing1')) placeholder = 'Pilih Pembimbing 1';
+                    else if (selectId.includes('pembimbing2')) placeholder = 'Pilih Pembimbing 2';
+                    else if (selectId.includes('penguji1')) placeholder = 'Pilih Penguji 1';
+                    else if (selectId.includes('penguji2')) placeholder = 'Pilih Penguji 2';
+                    
+                    select.innerHTML = `<option value="">${placeholder}</option>`;
+                    accounts.dosen.forEach(dosen => {
+                        if (dosen.status === 'aktif') {
+                            const option = document.createElement('option');
+                            option.value = dosen.nama;
+                            option.textContent = dosen.nama;
+                            if (option.value === currentValue) option.selected = true;
+                            select.appendChild(option);
+                        }
+                    });
+                }
+            });
+        }
+
+        function filterJudulSkripsi() {
+            const searchJudul = document.getElementById('searchJudulSkripsi').value.toLowerCase();
+            const filterProdi = document.getElementById('filterProdiSkripsi').value;
+            const filterTahun = document.getElementById('filterTahunSkripsi').value;
+            
+            filteredDaftarJudulSkripsi = submissions.daftarJudulSkripsi.filter(data => {
+                const judulMatch = !searchJudul || data.judul.toLowerCase().includes(searchJudul) || 
+                                  data.nama.toLowerCase().includes(searchJudul) || 
+                                  data.nim.includes(searchJudul);
+                const prodiMatch = !filterProdi || data.prodi === filterProdi;
+                const tahunMatch = !filterTahun || data.tahun === filterTahun;
+                return judulMatch && prodiMatch && tahunMatch;
+            });
+            
+            updateRekapJudulSkripsiTable();
+        }
+
+        function clearFilterJudulSkripsi() {
+            document.getElementById('searchJudulSkripsi').value = '';
+            document.getElementById('filterProdiSkripsi').value = '';
+            document.getElementById('filterTahunSkripsi').value = '';
+            filteredDaftarJudulSkripsi = [];
+            updateRekapJudulSkripsiTable();
+        }
+
+        function toggleSelectAllJudulSkripsi() {
+            const selectAll = document.getElementById('selectAllJudulSkripsi');
+            const checkboxes = document.querySelectorAll('.judul-skripsi-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+        }
+
+        function updateRekapJudulSkripsiTable() {
+            const tbody = document.getElementById('rekapJudulSkripsiTable');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            // Use filtered data if available, otherwise use all data
+            const dataToShow = filteredDaftarJudulSkripsi.length > 0 ? filteredDaftarJudulSkripsi : submissions.daftarJudulSkripsi;
+            
+            if (dataToShow.length > 0) {
+                dataToShow.forEach(data => {
+                    const row = document.createElement('tr');
+                    const checkboxHtml = `<input type="checkbox" class="judul-skripsi-checkbox" data-id="${data.id}" data-nim="${data.nim}">`;
+                    const judulSkripsi = data.judul || '-';
+                    
+                    row.innerHTML = `
+                        <td class="px-4 py-3">${checkboxHtml}</td>
+                        <td class="px-4 py-3 text-sm">${data.tahun}</td>
+                        <td class="px-4 py-3 text-sm">${data.nim}</td>
+                        <td class="px-4 py-3 text-sm">${data.nama}</td>
+                        <td class="px-4 py-3 text-sm">${data.prodi}</td>
+                        <td class="px-4 py-3 text-sm">${data.pembimbing1}</td>
+                        <td class="px-4 py-3 text-sm">${data.pembimbing2}</td>
+                        <td class="px-4 py-3 text-sm">${data.penguji1}</td>
+                        <td class="px-4 py-3 text-sm">${data.penguji2}</td>
+                        <td class="px-4 py-3 text-sm" title="${judulSkripsi}">${judulSkripsi.length > 50 ? judulSkripsi.substring(0, 50) + '...' : judulSkripsi}</td>
+                        <td class="px-4 py-3">
+                            <div class="flex space-x-1">
+                                <button onclick="editJudulSkripsi('${data.id}')" class="px-2 py-1 bg-yellow-600 text-white rounded text-xs hover:bg-yellow-700">Edit</button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            } else {
+                const searchJudul = document.getElementById('searchJudulSkripsi')?.value;
+                const filterProdi = document.getElementById('filterProdiSkripsi')?.value;
+                const filterTahun = document.getElementById('filterTahunSkripsi')?.value;
+                const message = (searchJudul || filterProdi || filterTahun) ? 
+                    'Tidak ada data yang sesuai dengan pencarian/filter' : 
+                    'Belum ada data judul skripsi';
+                tbody.innerHTML = `<tr><td colspan="11" class="px-4 py-8 text-center text-gray-500">${message}</td></tr>`;
+            }
+        }
+
+        function printJudulSkripsi() {
+            const dataToShow = filteredDaftarJudulSkripsi.length > 0 ? filteredDaftarJudulSkripsi : submissions.daftarJudulSkripsi;
+            const searchJudul = document.getElementById('searchJudulSkripsi').value;
+            const filterProdi = document.getElementById('filterProdiSkripsi').value;
+            const filterTahun = document.getElementById('filterTahunSkripsi').value;
+            
+            let titleSuffix = '';
+            if (searchJudul && filterProdi && filterTahun) {
+                titleSuffix = ` - Pencarian: "${searchJudul}" | ${filterProdi} Tahun ${filterTahun}`;
+            } else if (searchJudul && filterProdi) {
+                titleSuffix = ` - Pencarian: "${searchJudul}" | Program Studi ${filterProdi}`;
+            } else if (searchJudul && filterTahun) {
+                titleSuffix = ` - Pencarian: "${searchJudul}" | Tahun ${filterTahun}`;
+            } else if (filterProdi && filterTahun) {
+                titleSuffix = ` - ${filterProdi} Tahun ${filterTahun}`;
+            } else if (searchJudul) {
+                titleSuffix = ` - Pencarian: "${searchJudul}"`;
+            } else if (filterProdi) {
+                titleSuffix = ` - Program Studi ${filterProdi}`;
+            } else if (filterTahun) {
+                titleSuffix = ` - Tahun ${filterTahun}`;
+            }
+            
+            if (dataToShow.length === 0) {
+                alert('Tidak ada data judul skripsi untuk dicetak!');
+                return;
+            }
+            
+            const printWindow = window.open('', '_blank');
+            
+            let tableRows = '';
+            dataToShow.forEach((data, index) => {
+                tableRows += `
+                    <tr style="border-bottom: 1px solid #ddd;">
+                        <td style="padding: 8px; text-align: center; border-right: 1px solid #ddd; font-size: 10pt;">${index + 1}</td>
+                        <td style="padding: 8px; border-right: 1px solid #ddd; font-size: 10pt;">${data.tahun}</td>
+                        <td style="padding: 8px; border-right: 1px solid #ddd; font-size: 10pt;">${data.nim}</td>
+                        <td style="padding: 8px; border-right: 1px solid #ddd; font-size: 10pt;">${data.nama}</td>
+                        <td style="padding: 8px; border-right: 1px solid #ddd; font-size: 10pt;">${data.prodi}</td>
+                        <td style="padding: 8px; border-right: 1px solid #ddd; font-size: 10pt;">${data.pembimbing1}</td>
+                        <td style="padding: 8px; border-right: 1px solid #ddd; font-size: 10pt;">${data.pembimbing2}</td>
+                        <td style="padding: 8px; border-right: 1px solid #ddd; font-size: 10pt;">${data.penguji1}</td>
+                        <td style="padding: 8px; border-right: 1px solid #ddd; font-size: 10pt;">${data.penguji2}</td>
+                        <td style="padding: 8px; font-size: 10pt;">${data.judul}</td>
+                    </tr>
+                `;
+            });
+            
+            const printContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Daftar Judul Skripsi${titleSuffix} - STAI Al-Mas'udiyah</title>
+                    <style>
+                        @page {
+                            size: A4 landscape;
+                            margin: 1cm;
+                        }
+                        
+                        * {
+                            margin: 0;
+                            padding: 0;
+                            box-sizing: border-box;
+                        }
+                        
+                        body {
+                            font-family: 'Times New Roman', serif;
+                            font-size: 10pt;
+                            line-height: 1.3;
+                            color: #000;
+                            background: white;
+                        }
+                        
+                        .header {
+                            text-align: center;
+                            margin-bottom: 20px;
+                            border-bottom: 2px solid #7c3aed;
+                            padding-bottom: 15px;
+                        }
+                        
+                        .header h1 {
+                            font-size: 14pt;
+                            font-weight: bold;
+                            margin-bottom: 5px;
+                            color: #7c3aed;
+                        }
+                        
+                        .header h2 {
+                            font-size: 12pt;
+                            font-weight: normal;
+                            margin-bottom: 5px;
+                        }
+                        
+                        .header h3 {
+                            font-size: 11pt;
+                            font-weight: bold;
+                            color: #7c3aed;
+                        }
+                        
+                        .table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 20px;
+                            border: 2px solid #7c3aed;
+                        }
+                        
+                        .table th {
+                            background-color: #7c3aed;
+                            color: white;
+                            padding: 8px 4px;
+                            text-align: center;
+                            font-weight: bold;
+                            border-right: 1px solid white;
+                            font-size: 9pt;
+                        }
+                        
+                        .table th:last-child {
+                            border-right: none;
+                        }
+                        
+                        .table td {
+                            vertical-align: top;
+                        }
+                        
+                        .footer {
+                            margin-top: 20px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: flex-start;
+                        }
+                        
+                        .signature-box {
+                            text-align: center;
+                            width: 45%;
+                        }
+                        
+                        .signature-line {
+                            border-top: 1px solid #000;
+                            margin-top: 60px;
+                            padding-top: 5px;
+                        }
+                        
+                        .print-info {
+                            margin-top: 15px;
+                            text-align: center;
+                            font-size: 8pt;
+                            color: #666;
+                        }
+                        
+                        @media print {
+                            body {
+                                -webkit-print-color-adjust: exact;
+                                print-color-adjust: exact;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="header">
+                        <h1>DAFTAR JUDUL SKRIPSI${titleSuffix.toUpperCase()}</h1>
+                        <h2>STAI AL-MAS'UDIYAH SUKABUMI</h2>
+                        <h3>TAHUN AKADEMIK 2024/2025</h3>
+                    </div>
+                    
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th style="width: 3%;">No</th>
+                                <th style="width: 5%;">Tahun</th>
+                                <th style="width: 8%;">NIM</th>
+                                <th style="width: 12%;">Nama</th>
+                                <th style="width: 6%;">Prodi</th>
+                                <th style="width: 12%;">Pembimbing 1</th>
+                                <th style="width: 12%;">Pembimbing 2</th>
+                                <th style="width: 12%;">Penguji 1</th>
+                                <th style="width: 12%;">Penguji 2</th>
+                                <th style="width: 18%;">Judul Skripsi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tableRows}
+                        </tbody>
+                    </table>
+                    
+                    <div class="footer">
+                        <div class="signature-box">
+                            <p>Mengetahui,</p>
+                            <p style="margin-top: 10px;">Ketua Program Studi</p>
+                            <div class="signature-line">
+                                <p style="font-weight: bold;">Dr. H. Ahmad Syukri, M.Pd.I</p>
+                                <p style="font-size: 8pt;">NIDN. 2108067801</p>
+                            </div>
+                        </div>
+                        <div class="signature-box">
+                            <p>Sukabumi, ${new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                            <p style="margin-top: 10px;">Administrator</p>
+                            <div class="signature-line">
+                                <p style="font-weight: bold;">Administrator Sistem</p>
+                                <p style="font-size: 8pt;">STAI Al-Mas'udiyah</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="print-info">
+                        <p>Dicetak pada: ${new Date().toLocaleString('id-ID')} | Total: ${dataToShow.length} judul skripsi</p>
+                        <p>Sistem Manajemen Skripsi - STAI Al-Mas'udiyah Sukabumi</p>
+                    </div>
+                </body>
+                </html>
+            `;
+            
+            printWindow.document.write(printContent);
+            printWindow.document.close();
+            
+            // Wait for content to load then print
+            printWindow.onload = function() {
+                setTimeout(() => {
+                    printWindow.focus();
+                    printWindow.print();
+                }, 500);
+            };
+        }
+
         // Initialize empty data structure - all data from Firebase
         function initializeEmptyData() {
             // Initialize empty arrays - data will be loaded from Firebase
@@ -4746,6 +5512,7 @@
             submissions.jadwalSeminar = [];
             submissions.jadwalMunaqosyah = [];
             submissions.munaqosyah = [];
+            submissions.daftarJudulSkripsi = [];
             submissions.notifikasi = { mahasiswa: {}, dosen: {}, prodi: [] };
         }
 
@@ -4773,5 +5540,5 @@
             loadData();
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98015d50b78c40a4',t:'MTc1ODAzNjIwMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'980552c420267981',t:'MTc1ODA3NzcxMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
