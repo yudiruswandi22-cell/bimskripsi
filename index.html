@@ -1314,17 +1314,32 @@
                 // Initialize empty data first
                 initializeEmptyData();
                 
+                console.log('Loading data from Firebase...');
+                
                 // Load accounts from Firebase
                 await loadAccounts();
+                console.log('Accounts loaded:', {
+                    mahasiswa: accounts.mahasiswa.length,
+                    prodi: accounts.prodi.length,
+                    dosen: accounts.dosen.length
+                });
                 
                 // Load submissions from Firebase
                 await loadSubmissions();
+                console.log('Submissions loaded:', {
+                    judulSkripsi: submissions.judulSkripsi.length,
+                    pengajuanSeminar: submissions.pengajuanSeminar.length,
+                    bimbingan: submissions.bimbingan.length,
+                    pembimbing: submissions.pembimbing.length
+                });
                 
                 // Load status skripsi from Firebase
                 await loadStatusSkripsi();
+                console.log('Status skripsi loaded:', submissions.statusSkripsi.length);
                 
                 // Load daftar judul skripsi from Firebase
                 await loadDaftarJudulSkripsi();
+                console.log('Daftar judul skripsi loaded:', submissions.daftarJudulSkripsi.length);
                 
                 // Load notifications from Firebase
                 await loadNotifications();
@@ -1338,11 +1353,11 @@
                 console.log('All data loaded successfully from Firebase');
             } catch (error) {
                 console.error('Firebase connection error:', error);
-                // Initialize empty data if Firebase fails
+                // Initialize empty data if Firebase fails - NO DUMMY DATA
                 initializeEmptyData();
                 updateDashboardStats();
                 updateAllDisplays();
-                console.log('Firebase unavailable - starting with empty data');
+                console.log('Firebase unavailable - starting with completely empty data');
             }
         }
 
@@ -4902,13 +4917,52 @@
                 return;
             }
             
-            // Extract NIM from mahasiswa string (format: "Nama (NIM)")
-            const nimMatch = mahasiswaSelect.match(/\((\d+)\)/);
-            const nim = nimMatch ? nimMatch[1] : '';
-            const nama = mahasiswaSelect.split(' (')[0];
+            let nim = '';
+            let nama = '';
             
-            if (!nim) {
-                alert('Format mahasiswa tidak valid!');
+            // Enhanced parsing with multiple fallback strategies
+            try {
+                // Strategy 1: Extract from format "Nama (NIM)"
+                const nimMatch = mahasiswaSelect.match(/\((\d+)\)$/);
+                if (nimMatch) {
+                    nim = nimMatch[1];
+                    nama = mahasiswaSelect.replace(/\s*\(\d+\)$/, '').trim();
+                }
+                
+                // Strategy 2: If no match, try to find by exact string match
+                if (!nim || !nama) {
+                    const foundMahasiswa = accounts.mahasiswa.find(m => {
+                        const fullName = `${m.nama} (${m.nim})`;
+                        return mahasiswaSelect === fullName || 
+                               mahasiswaSelect === m.nama ||
+                               mahasiswaSelect === m.nim;
+                    });
+                    
+                    if (foundMahasiswa) {
+                        nim = foundMahasiswa.nim;
+                        nama = foundMahasiswa.nama;
+                    }
+                }
+                
+                // Strategy 3: If still no match, try partial matching
+                if (!nim || !nama) {
+                    const foundMahasiswa = accounts.mahasiswa.find(m => {
+                        return mahasiswaSelect.includes(m.nim) || mahasiswaSelect.includes(m.nama);
+                    });
+                    
+                    if (foundMahasiswa) {
+                        nim = foundMahasiswa.nim;
+                        nama = foundMahasiswa.nama;
+                    }
+                }
+                
+                // Final validation
+                if (!nim || !nama) {
+                    throw new Error('Mahasiswa tidak ditemukan');
+                }
+                
+            } catch (error) {
+                alert('Format mahasiswa tidak valid atau mahasiswa tidak ditemukan!\n\nSilakan pilih mahasiswa dari dropdown yang tersedia.');
                 return;
             }
             
@@ -4916,45 +4970,49 @@
             const existingIndex = submissions.statusSkripsi.findIndex(s => s.nim === nim);
             
             const statusData = {
-                id: existingIndex >= 0 ? submissions.statusSkripsi[existingIndex].id : Date.now().toString(),
                 nim: nim,
                 nama: nama,
                 status: status,
-                catatan: catatan,
+                catatan: catatan || '',
                 tanggalUpdate: new Date().toLocaleDateString('id-ID'),
                 timestamp: new Date()
             };
             
-            if (existingIndex >= 0) {
-                // Update existing status
-                submissions.statusSkripsi[existingIndex] = statusData;
-            } else {
-                // Add new status
-                submissions.statusSkripsi.push(statusData);
-            }
-            
             try {
-                // Save to Firebase
+                let docId = null;
+                
                 if (existingIndex >= 0) {
-                    await updateDoc(doc(db, 'status_skripsi', statusData.id), statusData);
+                    // Update existing status
+                    docId = submissions.statusSkripsi[existingIndex].id;
+                    if (docId) {
+                        await updateDoc(doc(db, 'status_skripsi', docId), statusData);
+                        submissions.statusSkripsi[existingIndex] = { id: docId, ...statusData };
+                    } else {
+                        // If no Firebase ID, create new document
+                        const docRef = await addDoc(collection(db, 'status_skripsi'), statusData);
+                        submissions.statusSkripsi[existingIndex] = { id: docRef.id, ...statusData };
+                    }
                 } else {
-                    await addDoc(collection(db, 'status_skripsi'), statusData);
+                    // Add new status
+                    const docRef = await addDoc(collection(db, 'status_skripsi'), statusData);
+                    submissions.statusSkripsi.push({ id: docRef.id, ...statusData });
                 }
+                
+                alert(`Status skripsi ${nama} berhasil diupdate menjadi "${status}"!`);
+                
+                // Clear form
+                document.getElementById('statusMahasiswaSelect').value = '';
+                document.getElementById('statusSkripsiSelect').value = '';
+                document.getElementById('statusCatatan').value = '';
+                
+                // Update displays
+                updateRekapStatusSkripsi();
+                updateDashboardStats();
+                
             } catch (error) {
-                console.log('Demo mode - status saved locally');
-                saveLocalData();
+                console.error('Firebase error:', error);
+                alert('Gagal menyimpan status skripsi. Pastikan koneksi internet stabil.');
             }
-            
-            alert(`Status skripsi ${nama} berhasil diupdate menjadi "${status}"!`);
-            
-            // Clear form
-            document.getElementById('statusMahasiswaSelect').value = '';
-            document.getElementById('statusSkripsiSelect').value = '';
-            document.getElementById('statusCatatan').value = '';
-            
-            // Update displays
-            updateRekapStatusSkripsi();
-            updateDashboardStats();
         }
         
         function updateRekapStatusSkripsi() {
@@ -5499,7 +5557,7 @@
 
         // Initialize empty data structure - all data from Firebase
         function initializeEmptyData() {
-            // Initialize empty arrays - data will be loaded from Firebase
+            // Initialize completely empty arrays - all data will be loaded from Firebase only
             accounts.mahasiswa = [];
             accounts.prodi = [];
             accounts.dosen = [];
@@ -5514,6 +5572,11 @@
             submissions.munaqosyah = [];
             submissions.daftarJudulSkripsi = [];
             submissions.notifikasi = { mahasiswa: {}, dosen: {}, prodi: [] };
+            
+            // Reset dashboard stats
+            dashboardStats.totalMahasiswa = 0;
+            dashboardStats.skripsiSelesai = 0;
+            dashboardStats.dalamProses = 0;
         }
 
         // Initialize page - Firebase exclusive
@@ -5540,5 +5603,5 @@
             loadData();
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'980552c420267981',t:'MTc1ODA3NzcxMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9806117ec22bfda7',t:'MTc1ODA4NTUyNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
