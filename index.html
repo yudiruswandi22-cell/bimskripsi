@@ -265,15 +265,7 @@
                 <div class="bg-white rounded-xl shadow-lg p-6">
                     <h3 class="text-xl font-semibold text-gray-800 mb-4">📊 Status Pengajuan & Notifikasi</h3>
                     <div id="statusPengajuan" class="space-y-4">
-                        <div class="p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <p class="font-medium text-yellow-800">Menunggu Validasi Prodi</p>
-                                    <p class="text-sm text-yellow-600">Diajukan: 15 Januari 2025</p>
-                                </div>
-                                <span class="px-3 py-1 bg-yellow-200 text-yellow-800 rounded-full text-sm">Pending</span>
-                            </div>
-                        </div>
+                        <!-- Status akan muncul di sini -->
                     </div>
                     
                     <!-- Notifikasi Jadwal Seminar -->
@@ -326,9 +318,7 @@
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Status</th>
                             </tr>
                         </thead>
-                        <tbody id="rekapSeminarMahasiswa" class="divide-y divide-gray-200">
-                            <!-- Data akan muncul di sini -->
-                        </tbody>
+                        <tbody id="rekapSeminarMahasiswa" class="divide-y divide-gray-200"></tbody>
                     </table>
                 </div>
             </div>
@@ -442,6 +432,48 @@
 
             <!-- Portal Program Studi Content -->
             <div id="portalProdi" class="hidden">
+                
+                <!-- Kelola Popup Dashboard -->
+                <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">🪄 Kelola Popup Dashboard</h3>
+                    <p class="text-sm text-gray-600 mb-4">Atur pesan yang muncul otomatis saat pengguna membuka Dashboard. Aman dan tidak mengganggu fitur lain.</p>
+                    <form class="grid grid-cols-1 md:grid-cols-2 gap-4" onsubmit="event.preventDefault()">
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Judul Popup</label>
+                            <input type="text" id="popupTitle" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Contoh: Pengumuman Penting"/>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Isi Pesan</label>
+                            <textarea id="popupMessage" class="w-full px-3 py-2 border border-gray-300 rounded-lg h-28 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Tulis informasi untuk pengguna..." ></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Teks Tombol (opsional)</label>
+                            <input type="text" id="popupButtonText" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Contoh: Buka Link"/>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Link Tombol (opsional)</label>
+                            <input type="url" id="popupButtonLink" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="https://..."/>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <input id="popupActive" type="checkbox" class="h-4 w-4">
+                            <label for="popupActive" class="text-sm text-gray-700">Aktifkan popup</label>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <input id="popupOncePerSession" type="checkbox" class="h-4 w-4" checked>
+                            <label for="popupOncePerSession" class="text-sm text-gray-700">Tampilkan sekali per sesi</label>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Tunda tampil (detik)</label>
+                            <input type="number" id="popupDelay" min="0" value="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
+                        </div>
+                        <div class="md:col-span-2 flex flex-wrap gap-3 pt-2">
+                            <button type="button" onclick="savePopupSettings()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Simpan Pengaturan</button>
+                            <button type="button" onclick="previewPopup()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Pratinjau</button>
+                            <button type="button" onclick="fillPopupForm(true)" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Reset</button>
+                            <span class="text-sm text-gray-500 self-center">Pengaturan disimpan ke server dan akan dipakai di Dashboard.</span>
+                        </div>
+                    </form>
+                </div>
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-bold text-gray-800">Portal Program Studi</h2>
                     <div class="flex items-center space-x-4">
@@ -545,9 +577,7 @@
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Status</th>
                             </tr>
                         </thead>
-                        <tbody id="rekapSeminarProdi" class="divide-y divide-gray-200">
-                            <!-- Data akan muncul di sini -->
-                        </tbody>
+                        <tbody id="rekapSeminarProdi" class="divide-y divide-gray-200"></tbody>
                     </table>
                 </div>
             </div>
@@ -581,9 +611,7 @@
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Status</th>
                             </tr>
                         </thead>
-                        <tbody id="rekapJadwalSeminar" class="divide-y divide-gray-200">
-                            <!-- Data jadwal akan muncul di sini -->
-                        </tbody>
+                        <tbody id="rekapJadwalSeminar" class="divide-y divide-gray-200"></tbody>
                     </table>
                 </div>
             </div>
@@ -654,9 +682,7 @@
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Status</th>
                             </tr>
                         </thead>
-                        <tbody id="rekapPembimbingTable" class="divide-y divide-gray-200">
-                            <!-- Data akan muncul di sini -->
-                        </tbody>
+                        <tbody id="rekapPembimbingTable" class="divide-y divide-gray-200"></tbody>
                     </table>
                 </div>
             </div>
@@ -797,9 +823,7 @@
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Status</th>
                             </tr>
                         </thead>
-                        <tbody id="rekapJadwalMunaqosyah" class="divide-y divide-gray-200">
-                            <!-- Data jadwal akan muncul di sini -->
-                        </tbody>
+                        <tbody id="rekapJadwalMunaqosyah" class="divide-y divide-gray-200"></tbody>
                     </table>
                 </div>
             </div>
@@ -860,8 +884,7 @@
                                 <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="persetujuanDosenTable" class="divide-y divide-gray-200">
-                        </tbody>
+                        <tbody id="persetujuanDosenTable" class="divide-y divide-gray-200"></tbody>
                     </table>
                 </div>
             </div>
@@ -969,11 +992,7 @@
                             </div>
                         </div>
                         
-                        <div id="riwayatBimbingan" class="space-y-3 max-h-96 overflow-y-auto">
-                            <div class="p-3 border border-gray-200 rounded-lg text-center text-gray-500">
-                                <p class="text-sm">Pilih mahasiswa untuk melihat riwayat bimbingan</p>
-                            </div>
-                        </div>
+                        <div id="riwayatBimbingan" class="space-y-3 max-h-96 overflow-y-auto"></div>
                     </div>
                 </div>
             </div>
@@ -1148,9 +1167,7 @@
                                     <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="rekapJudulSkripsiTable" class="divide-y divide-gray-200">
-                                <!-- Data akan muncul di sini -->
-                            </tbody>
+                            <tbody id="rekapJudulSkripsiTable" class="divide-y divide-gray-200"></tbody>
                         </table>
                     </div>
                 </div>
@@ -1229,8 +1246,7 @@
                                         <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody id="mahasiswaTable" class="divide-y divide-gray-200">
-                                </tbody>
+                                <tbody id="mahasiswaTable" class="divide-y divide-gray-200"></tbody>
                             </table>
                         </div>
                     </div>
@@ -1271,8 +1287,7 @@
                                         <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody id="prodiTable" class="divide-y divide-gray-200">
-                                </tbody>
+                                <tbody id="prodiTable" class="divide-y divide-gray-200"></tbody>
                             </table>
                         </div>
                     </div>
@@ -1313,10 +1328,40 @@
                                         <th class="px-4 py-3 text-left text-sm font-medium text-gray-700">Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody id="dosenTable" class="divide-y divide-gray-200">
-                                </tbody>
+                                <tbody id="dosenTable" class="divide-y divide-gray-200"></tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+            <!-- Popup Overlay -->
+        <div id="dashboardPopup" class="fixed inset-0 z-[60] hidden">
+            <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+            <div class="relative z-[61] max-w-lg mx-auto mt-24 px-4">
+                <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+                    <div class="px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white flex items-start justify-between">
+                        <div>
+                            <h4 id="popupTitleEl" class="text-lg font-semibold">Pengumuman</h4>
+                            <p class="text-xs text-white/80">Informasi dari Program Studi</p>
+                        </div>
+                        <button onclick="closePopup()" class="ml-4 text-white/80 hover:text-white p-1 rounded-lg">✕</button>
+                    </div>
+                    <div class="p-6 space-y-4">
+                        <div id="popupMessageEl" class="text-gray-700 leading-relaxed">Isi pesan popup akan tampil di sini.</div>
+                        <div id="popupCtaContainer" class="pt-2 hidden">
+                            <a id="popupCta" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                Lihat Selengkapnya
+                                <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                            </a>
+                        </div>
+                        <label class="flex items-center space-x-2">
+                            <input id="dontShowAgain" type="checkbox" class="h-4 w-4">
+                            <span class="text-sm text-gray-600">Jangan tampilkan lagi di sesi ini</span>
+                        </label>
+                    </div>
+                    <div class="px-6 py-3 bg-gray-50 flex items-center justify-end space-x-3">
+                        <button onclick="closePopup()" class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100">Tutup</button>
                     </div>
                 </div>
             </div>
@@ -2798,6 +2843,11 @@
             // Show selected page
             document.getElementById(pageId).classList.remove('hidden');
             
+            // Coba tampilkan popup saat masuk Dashboard
+            if (pageId === 'dashboard') {
+                maybeShowDashboardPopup();
+            }
+            
             // Check login status when switching pages with session validation
             if (pageId === 'mahasiswa') {
                 if (validateSession('mahasiswa')) {
@@ -2825,6 +2875,8 @@
                         document.getElementById('portalProdi').classList.remove('hidden');
                         document.getElementById('welcomeProdi').textContent = `Selamat datang, ${prodi.nama}`;
                         updateJudulValidasiTable();
+                        // Isi form popup jika ada pengaturan
+                        if (popupSettings) { try { fillPopupForm(); } catch(_){} }
                     } else {
                         document.getElementById('loginProdi').classList.remove('hidden');
                         document.getElementById('portalProdi').classList.add('hidden');
@@ -2940,17 +2992,7 @@
             
             // Update status display
             const statusDiv = document.getElementById('statusPengajuan');
-            statusDiv.innerHTML = `
-                <div class="p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="font-medium text-yellow-800">Menunggu Validasi Prodi</p>
-                            <p class="text-sm text-yellow-600">Diajukan: ${new Date().toLocaleDateString('id-ID')}</p>
-                        </div>
-                        <span class="px-3 py-1 bg-yellow-200 text-yellow-800 rounded-full text-sm">Pending</span>
-                    </div>
-                </div>
-            `;
+            statusDiv.innerHTML = '';
             
             // Update prodi table if prodi is logged in
             updateJudulValidasiTable();
@@ -4059,8 +4101,23 @@
             
             tbody.innerHTML = '';
             
-            // Use filtered data if available, otherwise use all data
-            const dataToShow = filteredJadwalSeminar.length > 0 ? filteredJadwalSeminar : submissions.jadwalSeminar;
+            // Filter data yang valid (bukan dummy)
+            let dataToShow = filteredJadwalSeminar.length > 0 ? filteredJadwalSeminar : submissions.jadwalSeminar;
+            
+            // Filter hanya data yang valid (bukan dummy)
+            dataToShow = dataToShow.filter(jadwal => 
+                jadwal.mahasiswa && 
+                jadwal.mahasiswa !== '' && 
+                !jadwal.mahasiswa.includes('Apip') &&
+                !jadwal.mahasiswa.includes('Ahmad Fauzi (2021001)') &&
+                jadwal.nim && 
+                jadwal.nim !== '' &&
+                jadwal.nim !== '2021001' &&
+                jadwal.tanggal &&
+                jadwal.ruangan &&
+                jadwal.penguji1 &&
+                jadwal.penguji2
+            );
             
             dataToShow.forEach(jadwal => {
                 const row = document.createElement('tr');
@@ -4077,12 +4134,6 @@
                 `;
                 tbody.appendChild(row);
             });
-            
-            if (dataToShow.length === 0) {
-                const filterDate = document.getElementById('filterTanggalSeminar')?.value;
-                const message = filterDate ? 'Tidak ada jadwal pada tanggal yang dipilih' : 'Belum ada jadwal seminar yang dibuat';
-                tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500">${message}</td></tr>`;
-            }
         }
 
         function updateRekapJadwalMunaqosyah() {
@@ -4091,7 +4142,7 @@
             
             tbody.innerHTML = '';
             
-            // Use filtered data if available, otherwise use all data
+            // Selalu gunakan data dari Firebase (tanpa dummy)
             const dataToShow = filteredJadwalMunaqosyah.length > 0 ? filteredJadwalMunaqosyah : submissions.jadwalMunaqosyah;
             
             dataToShow.forEach(jadwal => {
@@ -4172,7 +4223,12 @@
                 const nimLogin = sessionStorage.getItem('mahasiswaLogin');
                 tbodyMahasiswa.innerHTML = '';
                 
-                const pengajuanMahasiswa = submissions.pengajuanSeminar.filter(p => p.nim === nimLogin);
+                // Filter hanya data yang valid (bukan dummy)
+                const pengajuanMahasiswa = submissions.pengajuanSeminar.filter(p => 
+                    p.nim === nimLogin && 
+                    p.nim && p.nim !== '' && 
+                    p.nama && p.nama !== '' && p.nama !== 'Apip'
+                );
                 
                 if (pengajuanMahasiswa.length > 0) {
                     pengajuanMahasiswa.forEach(pengajuan => {
@@ -4188,8 +4244,6 @@
                         `;
                         tbodyMahasiswa.appendChild(row);
                     });
-                } else {
-                    tbodyMahasiswa.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">Belum ada pengajuan seminar proposal</td></tr>';
                 }
             }
             
@@ -4198,8 +4252,14 @@
             if (tbodyProdi) {
                 tbodyProdi.innerHTML = '';
                 
-                if (submissions.pengajuanSeminar.length > 0) {
-                    submissions.pengajuanSeminar.forEach(pengajuan => {
+                // Filter hanya data yang valid (bukan dummy)
+                const validPengajuan = submissions.pengajuanSeminar.filter(pengajuan => 
+                    pengajuan.nim && pengajuan.nim !== '' && 
+                    pengajuan.nama && pengajuan.nama !== '' && pengajuan.nama !== 'Apip'
+                );
+                
+                if (validPengajuan.length > 0) {
+                    validPengajuan.forEach(pengajuan => {
                         const row = document.createElement('tr');
                         const checkboxHtml = `<input type="checkbox" class="seminar-checkbox" data-id="${pengajuan.id}" data-nim="${pengajuan.nim}">`;
                         
@@ -4212,8 +4272,6 @@
                         `;
                         tbodyProdi.appendChild(row);
                     });
-                } else {
-                    tbodyProdi.innerHTML = '<tr><td colspan="5" class="px-4 py-8 text-center text-gray-500">Belum ada pengajuan seminar proposal</td></tr>';
                 }
             }
         }
@@ -5141,6 +5199,9 @@
             };
         }
 
+        // Deklarasi ringan agar tidak error jika dipanggil lebih awal
+        function fillPopupForm() { try { /* akan dioverride di bawah jika ada */ } catch(_){} }
+
         // Status Skripsi Management Functions
         async function updateStatusSkripsi() {
             // Prevent default form submission
@@ -5819,6 +5880,143 @@
             dashboardStats.dalamProses = 0;
         }
 
+        // Popup settings state
+        let popupSettings = null;
+
+        // Simpan & muat pengaturan popup via Firestore
+        async function loadPopupSettings() {
+            try {
+                const snap = await getDocs(collection(db, 'settings_popup'));
+                popupSettings = null;
+                snap.forEach(d => { popupSettings = { id: d.id, ...d.data() }; });
+                // Jika belum ada, inisialisasi default (tidak aktif)
+                if (!popupSettings) {
+                    popupSettings = { active: false, title: 'Pengumuman', message: '', buttonText: '', buttonLink: '', oncePerSession: true, delay: 0 };
+                }
+            } catch (e) {
+                console.warn('Gagal memuat pengaturan popup:', e);
+                if (!popupSettings) popupSettings = { active: false, title: 'Pengumuman', message: '', buttonText: '', buttonLink: '', oncePerSession: true, delay: 0 };
+            }
+        }
+
+        async function savePopupSettings() {
+            const title = document.getElementById('popupTitle')?.value || '';
+            const message = document.getElementById('popupMessage')?.value || '';
+            const buttonText = document.getElementById('popupButtonText')?.value || '';
+            const buttonLink = document.getElementById('popupButtonLink')?.value || '';
+            const active = document.getElementById('popupActive')?.checked || false;
+            const oncePerSession = document.getElementById('popupOncePerSession')?.checked || false;
+            const delay = parseInt(document.getElementById('popupDelay')?.value || '0', 10) || 0;
+
+            const data = { title, message, buttonText, buttonLink, active, oncePerSession, delay, updatedAt: new Date() };
+
+            try {
+                if (popupSettings && popupSettings.id) {
+                    await updateDoc(doc(db, 'settings_popup', popupSettings.id), data);
+                } else {
+                    const ref = await addDoc(collection(db, 'settings_popup'), data);
+                    popupSettings.id = ref.id;
+                }
+                Object.assign(popupSettings, data);
+                alert('Pengaturan popup berhasil disimpan!');
+            } catch (e) {
+                console.error('Gagal simpan popup:', e);
+                alert('Gagal menyimpan pengaturan. Pastikan koneksi internet stabil.');
+            }
+        }
+
+        function fillPopupForm(resetOnly = false) {
+            if (!popupSettings || resetOnly) {
+                document.getElementById('popupTitle') && (document.getElementById('popupTitle').value = popupSettings?.title || 'Pengumuman');
+                document.getElementById('popupMessage') && (document.getElementById('popupMessage').value = popupSettings?.message || '');
+                document.getElementById('popupButtonText') && (document.getElementById('popupButtonText').value = popupSettings?.buttonText || '');
+                document.getElementById('popupButtonLink') && (document.getElementById('popupButtonLink').value = popupSettings?.buttonLink || '');
+                document.getElementById('popupActive') && (document.getElementById('popupActive').checked = !!(popupSettings?.active));
+                document.getElementById('popupOncePerSession') && (document.getElementById('popupOncePerSession').checked = popupSettings?.oncePerSession ?? true);
+                document.getElementById('popupDelay') && (document.getElementById('popupDelay').value = popupSettings?.delay ?? 0);
+                return;
+            }
+            document.getElementById('popupTitle') && (document.getElementById('popupTitle').value = popupSettings.title || 'Pengumuman');
+            document.getElementById('popupMessage') && (document.getElementById('popupMessage').value = popupSettings.message || '');
+            document.getElementById('popupButtonText') && (document.getElementById('popupButtonText').value = popupSettings.buttonText || '');
+            document.getElementById('popupButtonLink') && (document.getElementById('popupButtonLink').value = popupSettings.buttonLink || '');
+            document.getElementById('popupActive') && (document.getElementById('popupActive').checked = !!popupSettings.active);
+            document.getElementById('popupOncePerSession') && (document.getElementById('popupOncePerSession').checked = popupSettings.oncePerSession ?? true);
+            document.getElementById('popupDelay') && (document.getElementById('popupDelay').value = popupSettings.delay ?? 0);
+        }
+
+        function previewPopup() {
+            // Ambil nilai dari form tanpa menyimpan
+            const title = document.getElementById('popupTitle')?.value || 'Pengumuman';
+            const message = document.getElementById('popupMessage')?.value || '';
+            const buttonText = document.getElementById('popupButtonText')?.value || '';
+            const buttonLink = document.getElementById('popupButtonLink')?.value || '';
+            const oncePerSession = document.getElementById('popupOncePerSession')?.checked || false;
+            showPopup({ title, message, buttonText, buttonLink, oncePerSession });
+        }
+
+        function showPopup(data) {
+            const overlay = document.getElementById('dashboardPopup');
+            const titleEl = document.getElementById('popupTitleEl');
+            const msgEl = document.getElementById('popupMessageEl');
+            const ctaWrap = document.getElementById('popupCtaContainer');
+            const cta = document.getElementById('popupCta');
+            const dontShow = document.getElementById('dontShowAgain');
+            if (!overlay || !titleEl || !msgEl) return;
+
+            titleEl.textContent = data.title || 'Pengumuman';
+            msgEl.textContent = data.message || '';
+
+            if (data.buttonText && data.buttonLink) {
+                ctaWrap.classList.remove('hidden');
+                cta.textContent = data.buttonText;
+                cta.onclick = (e) => {
+                    e.preventDefault();
+                    window.open(data.buttonLink, '_blank');
+                };
+            } else {
+                ctaWrap.classList.add('hidden');
+            }
+
+            dontShow.checked = false;
+            overlay.classList.remove('hidden');
+        }
+
+        function closePopup() {
+            const overlay = document.getElementById('dashboardPopup');
+            if (!overlay) return;
+            // Simpan preferensi sesi jika dicentang
+            const dontShow = document.getElementById('dontShowAgain');
+            if (dontShow?.checked) {
+                sessionStorage.setItem('dashboardPopupSeen', '1');
+            }
+            overlay.classList.add('hidden');
+        }
+
+        async function maybeShowDashboardPopup() {
+            // Tampilkan popup hanya di halaman dashboard
+            const isDashboardVisible = !document.getElementById('dashboard')?.classList.contains('hidden');
+            if (!isDashboardVisible) return;
+
+            // Muat pengaturan jika belum ada
+            if (!popupSettings) await loadPopupSettings();
+
+            if (!popupSettings?.active) return;
+
+            // Periksa preferensi sesi
+            if (popupSettings.oncePerSession && sessionStorage.getItem('dashboardPopupSeen') === '1') return;
+
+            const delay = Math.max(0, parseInt(popupSettings.delay || 0, 10));
+            setTimeout(() => {
+                showPopup(popupSettings);
+            }, delay * 1000);
+        }
+
+        // Pastikan popup form terisi saat Prodi login
+        function ensurePopupFormFilled() {
+            fillPopupForm();
+        }
+
         // Initialize page - Firebase exclusive
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize without triggering events
@@ -5838,10 +6036,23 @@
             // Initialize filter arrays
             filteredJadwalSeminar = [];
             filteredJadwalMunaqosyah = [];
+
+            // Pastikan tbody rekap mulai benar-benar kosong
+            const rsMhs = document.getElementById('rekapSeminarMahasiswa');
+            if (rsMhs) rsMhs.innerHTML = '';
+            const rsProdi = document.getElementById('rekapSeminarProdi');
+            if (rsProdi) rsProdi.innerHTML = '';
+            const rjSem = document.getElementById('rekapJadwalSeminar');
+            if (rjSem) rjSem.innerHTML = '';
             
             // Load data from Firebase only - no demo data
-            loadData();
+            loadData().then(async () => {
+                // Muat pengaturan popup lalu tampilkan jika perlu di Dashboard
+                await loadPopupSettings();
+                fillPopupForm();
+                maybeShowDashboardPopup();
+            });
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9806f485c4f90cea',t:'MTc1ODA5NDgyMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98ab583b35f512b0',t:'MTc1OTgxODU3Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
