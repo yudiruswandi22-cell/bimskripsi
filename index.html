@@ -436,43 +436,122 @@
                 <!-- Kelola Popup Dashboard -->
                 <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
                     <h3 class="text-xl font-semibold text-gray-800 mb-4">🪄 Kelola Popup Dashboard</h3>
-                    <p class="text-sm text-gray-600 mb-4">Atur pesan yang muncul otomatis saat pengguna membuka Dashboard. Aman dan tidak mengganggu fitur lain.</p>
-                    <form class="grid grid-cols-1 md:grid-cols-2 gap-4" onsubmit="event.preventDefault()">
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Judul Popup</label>
-                            <input type="text" id="popupTitle" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Contoh: Pengumuman Penting"/>
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Isi Pesan</label>
-                            <textarea id="popupMessage" class="w-full px-3 py-2 border border-gray-300 rounded-lg h-28 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Tulis informasi untuk pengguna..." ></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Teks Tombol (opsional)</label>
-                            <input type="text" id="popupButtonText" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Contoh: Buka Link"/>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Link Tombol (opsional)</label>
-                            <input type="url" id="popupButtonLink" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="https://..."/>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <input id="popupActive" type="checkbox" class="h-4 w-4">
-                            <label for="popupActive" class="text-sm text-gray-700">Aktifkan popup</label>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <input id="popupOncePerSession" type="checkbox" class="h-4 w-4" checked>
-                            <label for="popupOncePerSession" class="text-sm text-gray-700">Tampilkan sekali per sesi</label>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Tunda tampil (detik)</label>
-                            <input type="number" id="popupDelay" min="0" value="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
-                        </div>
-                        <div class="md:col-span-2 flex flex-wrap gap-3 pt-2">
-                            <button type="button" onclick="savePopupSettings()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Simpan Pengaturan</button>
-                            <button type="button" onclick="previewPopup()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Pratinjau</button>
-                            <button type="button" onclick="fillPopupForm(true)" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Reset</button>
-                            <span class="text-sm text-gray-500 self-center">Pengaturan disimpan ke server dan akan dipakai di Dashboard.</span>
-                        </div>
-                    </form>
+                    <p class="text-sm text-gray-600 mb-4">Atur pesan atau iklan bergambar yang muncul otomatis saat pengguna membuka Dashboard. Aman dan tidak mengganggu fitur lain.</p>
+                    
+                    <!-- Tab Navigation for Popup Types -->
+                    <div class="border-b border-gray-200 mb-6">
+                        <nav class="-mb-px flex space-x-8">
+                            <button onclick="showPopupTab('text')" id="textPopupTab" class="popup-tab-btn py-2 px-1 border-b-2 border-blue-500 text-blue-600 font-medium text-sm">Popup Teks</button>
+                            <button onclick="showPopupTab('image')" id="imagePopupTab" class="popup-tab-btn py-2 px-1 border-b-2 border-transparent text-gray-500 hover:text-gray-700 font-medium text-sm">Popup Gambar</button>
+                        </nav>
+                    </div>
+
+                    <!-- Text Popup Tab -->
+                    <div id="textPopupContent" class="popup-tab-content">
+                        <form class="grid grid-cols-1 md:grid-cols-2 gap-4" onsubmit="event.preventDefault()">
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Judul Popup</label>
+                                <input type="text" id="popupTitle" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Contoh: Pengumuman Penting"/>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Isi Pesan</label>
+                                <textarea id="popupMessage" class="w-full px-3 py-2 border border-gray-300 rounded-lg h-28 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Tulis informasi untuk pengguna..." ></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Teks Tombol (opsional)</label>
+                                <input type="text" id="popupButtonText" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Contoh: Buka Link"/>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Link Tombol (opsional)</label>
+                                <input type="url" id="popupButtonLink" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="https://..."/>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <input id="popupActive" type="checkbox" class="h-4 w-4">
+                                <label for="popupActive" class="text-sm text-gray-700">Aktifkan popup teks</label>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <input id="popupOncePerSession" type="checkbox" class="h-4 w-4" checked>
+                                <label for="popupOncePerSession" class="text-sm text-gray-700">Tampilkan sekali per sesi</label>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tunda tampil (detik)</label>
+                                <input type="number" id="popupDelay" min="0" value="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"/>
+                            </div>
+                            <div class="md:col-span-2 flex flex-wrap gap-3 pt-2">
+                                <button type="button" onclick="savePopupSettings()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Simpan Pengaturan</button>
+                                <button type="button" onclick="previewPopup()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Pratinjau</button>
+                                <button type="button" onclick="fillPopupForm(true)" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Reset</button>
+                                <span class="text-sm text-gray-500 self-center">Pengaturan disimpan ke server dan akan dipakai di Dashboard.</span>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Image Popup Tab -->
+                    <div id="imagePopupContent" class="popup-tab-content hidden">
+                        <form class="grid grid-cols-1 md:grid-cols-2 gap-4" onsubmit="event.preventDefault()">
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Judul Popup Gambar</label>
+                                <input type="text" id="imagePopupTitle" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" placeholder="Contoh: Iklan Kampus"/>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">URL Gambar</label>
+                                <input type="url" id="imagePopupUrl" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" placeholder="https://example.com/image.jpg"/>
+                                <p class="text-xs text-gray-500 mt-1">Gunakan URL gambar yang dapat diakses publik (JPG, PNG, GIF). Ukuran maksimal yang disarankan: 800x600px</p>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Deskripsi Gambar (Alt Text)</label>
+                                <input type="text" id="imagePopupAlt" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" placeholder="Deskripsi gambar untuk aksesibilitas"/>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Teks Tombol (opsional)</label>
+                                <input type="text" id="imagePopupButtonText" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" placeholder="Contoh: Daftar Sekarang"/>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Link Tombol (opsional)</label>
+                                <input type="url" id="imagePopupButtonLink" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500" placeholder="https://..."/>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Ukuran Popup</label>
+                                <select id="imagePopupSize" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                                    <option value="small">Kecil (400px)</option>
+                                    <option value="medium" selected>Sedang (600px)</option>
+                                    <option value="large">Besar (800px)</option>
+                                    <option value="fullscreen">Layar Penuh</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Posisi Popup</label>
+                                <select id="imagePopupPosition" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500">
+                                    <option value="center" selected>Tengah</option>
+                                    <option value="top">Atas</option>
+                                    <option value="bottom">Bawah</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <input id="imagePopupActive" type="checkbox" class="h-4 w-4">
+                                <label for="imagePopupActive" class="text-sm text-gray-700">Aktifkan popup gambar</label>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <input id="imagePopupOncePerSession" type="checkbox" class="h-4 w-4" checked>
+                                <label for="imagePopupOncePerSession" class="text-sm text-gray-700">Tampilkan sekali per sesi</label>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tunda tampil (detik)</label>
+                                <input type="number" id="imagePopupDelay" min="0" value="2" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"/>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Durasi tampil (detik, 0 = manual)</label>
+                                <input type="number" id="imagePopupDuration" min="0" value="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"/>
+                                <p class="text-xs text-gray-500 mt-1">0 = popup tidak otomatis tertutup, user harus menutup manual</p>
+                            </div>
+                            <div class="md:col-span-2 flex flex-wrap gap-3 pt-2">
+                                <button type="button" onclick="saveImagePopupSettings()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Simpan Pengaturan</button>
+                                <button type="button" onclick="previewImagePopup()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Pratinjau</button>
+                                <button type="button" onclick="fillImagePopupForm(true)" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Reset</button>
+                                <span class="text-sm text-gray-500 self-center">Popup gambar akan tampil bersamaan dengan popup teks jika keduanya aktif.</span>
+                            </div>
+                        </form>
+                    </div>
                 </div>
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-bold text-gray-800">Portal Program Studi</h2>
@@ -1335,7 +1414,7 @@
                 </div>
             </div>
         </div>
-            <!-- Popup Overlay -->
+            <!-- Text Popup Overlay -->
         <div id="dashboardPopup" class="fixed inset-0 z-[60] hidden">
             <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
             <div class="relative z-[61] max-w-lg mx-auto mt-24 px-4">
@@ -1362,6 +1441,74 @@
                     </div>
                     <div class="px-6 py-3 bg-gray-50 flex items-center justify-end space-x-3">
                         <button onclick="closePopup()" class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100">Tutup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Image Popup Overlay -->
+        <div id="imagePopupOverlay" class="fixed inset-0 z-[70] hidden">
+            <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="closeImagePopup()"></div>
+            <div id="imagePopupContainer" class="relative z-[71] flex items-center justify-center min-h-screen p-4">
+                <div id="imagePopupContent" class="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl w-full mx-auto relative">
+                    <!-- Close Button -->
+                    <button onclick="closeImagePopup()" class="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full w-10 h-10 flex items-center justify-center transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                    
+                    <!-- Header -->
+                    <div class="px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white">
+                        <h4 id="imagePopupTitleEl" class="text-lg font-semibold">Iklan Kampus</h4>
+                        <p class="text-xs text-white/80">Informasi dari Program Studi</p>
+                    </div>
+                    
+                    <!-- Image Content -->
+                    <div class="relative">
+                        <div id="imagePopupImageContainer" class="flex items-center justify-center bg-gray-100">
+                            <img id="imagePopupImage" src="" alt="" class="max-w-full h-auto object-contain" style="max-height: 70vh;" onerror="handleImageError(this)">
+                        </div>
+                        
+                        <!-- Loading Indicator -->
+                        <div id="imagePopupLoading" class="absolute inset-0 flex items-center justify-center bg-gray-100">
+                            <div class="flex flex-col items-center space-y-3">
+                                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+                                <p class="text-gray-600 text-sm">Memuat gambar...</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Error State -->
+                        <div id="imagePopupError" class="hidden absolute inset-0 flex items-center justify-center bg-gray-100 p-8">
+                            <div class="text-center">
+                                <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                </svg>
+                                <h3 class="text-lg font-medium text-gray-900 mb-2">Gambar Tidak Dapat Dimuat</h3>
+                                <p class="text-gray-600 text-sm">URL gambar tidak valid atau tidak dapat diakses</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Footer -->
+                    <div class="px-6 py-4 bg-gray-50 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <label class="flex items-center space-x-2">
+                                <input id="dontShowImageAgain" type="checkbox" class="h-4 w-4">
+                                <span class="text-sm text-gray-600">Jangan tampilkan lagi di sesi ini</span>
+                            </label>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <div id="imagePopupCtaContainer" class="hidden">
+                                <a id="imagePopupCta" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                                    <span id="imagePopupCtaText">Lihat Selengkapnya</span>
+                                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                            <button onclick="closeImagePopup()" class="px-4 py-2 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors">Tutup</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -5882,6 +6029,33 @@
 
         // Popup settings state
         let popupSettings = null;
+        let imagePopupSettings = null;
+
+        // Tab management for popup settings
+        function showPopupTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.popup-tab-content');
+            tabContents.forEach(content => content.classList.add('hidden'));
+            
+            // Show selected tab content
+            document.getElementById(tabName + 'PopupContent').classList.remove('hidden');
+            
+            // Update tab buttons
+            const tabButtons = document.querySelectorAll('.popup-tab-btn');
+            tabButtons.forEach(btn => {
+                btn.classList.remove('border-blue-500', 'text-blue-600', 'border-green-500', 'text-green-600');
+                btn.classList.add('border-transparent', 'text-gray-500');
+            });
+            
+            const activeButton = document.getElementById(tabName + 'PopupTab');
+            if (tabName === 'text') {
+                activeButton.classList.remove('border-transparent', 'text-gray-500');
+                activeButton.classList.add('border-blue-500', 'text-blue-600');
+            } else {
+                activeButton.classList.remove('border-transparent', 'text-gray-500');
+                activeButton.classList.add('border-green-500', 'text-green-600');
+            }
+        }
 
         // Simpan & muat pengaturan popup via Firestore
         async function loadPopupSettings() {
@@ -5896,6 +6070,48 @@
             } catch (e) {
                 console.warn('Gagal memuat pengaturan popup:', e);
                 if (!popupSettings) popupSettings = { active: false, title: 'Pengumuman', message: '', buttonText: '', buttonLink: '', oncePerSession: true, delay: 0 };
+            }
+        }
+
+        // Load image popup settings
+        async function loadImagePopupSettings() {
+            try {
+                const snap = await getDocs(collection(db, 'settings_image_popup'));
+                imagePopupSettings = null;
+                snap.forEach(d => { imagePopupSettings = { id: d.id, ...d.data() }; });
+                // Jika belum ada, inisialisasi default (tidak aktif)
+                if (!imagePopupSettings) {
+                    imagePopupSettings = { 
+                        active: false, 
+                        title: 'Iklan Kampus', 
+                        imageUrl: '', 
+                        altText: '',
+                        buttonText: '', 
+                        buttonLink: '', 
+                        size: 'medium',
+                        position: 'center',
+                        oncePerSession: true, 
+                        delay: 2,
+                        duration: 0
+                    };
+                }
+            } catch (e) {
+                console.warn('Gagal memuat pengaturan image popup:', e);
+                if (!imagePopupSettings) {
+                    imagePopupSettings = { 
+                        active: false, 
+                        title: 'Iklan Kampus', 
+                        imageUrl: '', 
+                        altText: '',
+                        buttonText: '', 
+                        buttonLink: '', 
+                        size: 'medium',
+                        position: 'center',
+                        oncePerSession: true, 
+                        delay: 2,
+                        duration: 0
+                    };
+                }
             }
         }
 
@@ -5918,9 +6134,48 @@
                     popupSettings.id = ref.id;
                 }
                 Object.assign(popupSettings, data);
-                alert('Pengaturan popup berhasil disimpan!');
+                alert('Pengaturan popup teks berhasil disimpan!');
             } catch (e) {
                 console.error('Gagal simpan popup:', e);
+                alert('Gagal menyimpan pengaturan. Pastikan koneksi internet stabil.');
+            }
+        }
+
+        // Save image popup settings
+        async function saveImagePopupSettings() {
+            const title = document.getElementById('imagePopupTitle')?.value || '';
+            const imageUrl = document.getElementById('imagePopupUrl')?.value || '';
+            const altText = document.getElementById('imagePopupAlt')?.value || '';
+            const buttonText = document.getElementById('imagePopupButtonText')?.value || '';
+            const buttonLink = document.getElementById('imagePopupButtonLink')?.value || '';
+            const size = document.getElementById('imagePopupSize')?.value || 'medium';
+            const position = document.getElementById('imagePopupPosition')?.value || 'center';
+            const active = document.getElementById('imagePopupActive')?.checked || false;
+            const oncePerSession = document.getElementById('imagePopupOncePerSession')?.checked || false;
+            const delay = parseInt(document.getElementById('imagePopupDelay')?.value || '2', 10) || 2;
+            const duration = parseInt(document.getElementById('imagePopupDuration')?.value || '0', 10) || 0;
+
+            if (active && !imageUrl) {
+                alert('URL gambar harus diisi jika popup gambar diaktifkan!');
+                return;
+            }
+
+            const data = { 
+                title, imageUrl, altText, buttonText, buttonLink, size, position, 
+                active, oncePerSession, delay, duration, updatedAt: new Date() 
+            };
+
+            try {
+                if (imagePopupSettings && imagePopupSettings.id) {
+                    await updateDoc(doc(db, 'settings_image_popup', imagePopupSettings.id), data);
+                } else {
+                    const ref = await addDoc(collection(db, 'settings_image_popup'), data);
+                    imagePopupSettings.id = ref.id;
+                }
+                Object.assign(imagePopupSettings, data);
+                alert('Pengaturan popup gambar berhasil disimpan!');
+            } catch (e) {
+                console.error('Gagal simpan image popup:', e);
                 alert('Gagal menyimpan pengaturan. Pastikan koneksi internet stabil.');
             }
         }
@@ -5945,6 +6200,35 @@
             document.getElementById('popupDelay') && (document.getElementById('popupDelay').value = popupSettings.delay ?? 0);
         }
 
+        // Fill image popup form
+        function fillImagePopupForm(resetOnly = false) {
+            if (!imagePopupSettings || resetOnly) {
+                document.getElementById('imagePopupTitle') && (document.getElementById('imagePopupTitle').value = imagePopupSettings?.title || 'Iklan Kampus');
+                document.getElementById('imagePopupUrl') && (document.getElementById('imagePopupUrl').value = imagePopupSettings?.imageUrl || '');
+                document.getElementById('imagePopupAlt') && (document.getElementById('imagePopupAlt').value = imagePopupSettings?.altText || '');
+                document.getElementById('imagePopupButtonText') && (document.getElementById('imagePopupButtonText').value = imagePopupSettings?.buttonText || '');
+                document.getElementById('imagePopupButtonLink') && (document.getElementById('imagePopupButtonLink').value = imagePopupSettings?.buttonLink || '');
+                document.getElementById('imagePopupSize') && (document.getElementById('imagePopupSize').value = imagePopupSettings?.size || 'medium');
+                document.getElementById('imagePopupPosition') && (document.getElementById('imagePopupPosition').value = imagePopupSettings?.position || 'center');
+                document.getElementById('imagePopupActive') && (document.getElementById('imagePopupActive').checked = !!(imagePopupSettings?.active));
+                document.getElementById('imagePopupOncePerSession') && (document.getElementById('imagePopupOncePerSession').checked = imagePopupSettings?.oncePerSession ?? true);
+                document.getElementById('imagePopupDelay') && (document.getElementById('imagePopupDelay').value = imagePopupSettings?.delay ?? 2);
+                document.getElementById('imagePopupDuration') && (document.getElementById('imagePopupDuration').value = imagePopupSettings?.duration ?? 0);
+                return;
+            }
+            document.getElementById('imagePopupTitle') && (document.getElementById('imagePopupTitle').value = imagePopupSettings.title || 'Iklan Kampus');
+            document.getElementById('imagePopupUrl') && (document.getElementById('imagePopupUrl').value = imagePopupSettings.imageUrl || '');
+            document.getElementById('imagePopupAlt') && (document.getElementById('imagePopupAlt').value = imagePopupSettings.altText || '');
+            document.getElementById('imagePopupButtonText') && (document.getElementById('imagePopupButtonText').value = imagePopupSettings.buttonText || '');
+            document.getElementById('imagePopupButtonLink') && (document.getElementById('imagePopupButtonLink').value = imagePopupSettings.buttonLink || '');
+            document.getElementById('imagePopupSize') && (document.getElementById('imagePopupSize').value = imagePopupSettings.size || 'medium');
+            document.getElementById('imagePopupPosition') && (document.getElementById('imagePopupPosition').value = imagePopupSettings.position || 'center');
+            document.getElementById('imagePopupActive') && (document.getElementById('imagePopupActive').checked = !!imagePopupSettings.active);
+            document.getElementById('imagePopupOncePerSession') && (document.getElementById('imagePopupOncePerSession').checked = imagePopupSettings.oncePerSession ?? true);
+            document.getElementById('imagePopupDelay') && (document.getElementById('imagePopupDelay').value = imagePopupSettings.delay ?? 2);
+            document.getElementById('imagePopupDuration') && (document.getElementById('imagePopupDuration').value = imagePopupSettings.duration ?? 0);
+        }
+
         function previewPopup() {
             // Ambil nilai dari form tanpa menyimpan
             const title = document.getElementById('popupTitle')?.value || 'Pengumuman';
@@ -5953,6 +6237,26 @@
             const buttonLink = document.getElementById('popupButtonLink')?.value || '';
             const oncePerSession = document.getElementById('popupOncePerSession')?.checked || false;
             showPopup({ title, message, buttonText, buttonLink, oncePerSession });
+        }
+
+        // Preview image popup
+        function previewImagePopup() {
+            const title = document.getElementById('imagePopupTitle')?.value || 'Iklan Kampus';
+            const imageUrl = document.getElementById('imagePopupUrl')?.value || '';
+            const altText = document.getElementById('imagePopupAlt')?.value || '';
+            const buttonText = document.getElementById('imagePopupButtonText')?.value || '';
+            const buttonLink = document.getElementById('imagePopupButtonLink')?.value || '';
+            const size = document.getElementById('imagePopupSize')?.value || 'medium';
+            const position = document.getElementById('imagePopupPosition')?.value || 'center';
+            const oncePerSession = document.getElementById('imagePopupOncePerSession')?.checked || false;
+            const duration = parseInt(document.getElementById('imagePopupDuration')?.value || '0', 10) || 0;
+
+            if (!imageUrl) {
+                alert('Masukkan URL gambar untuk pratinjau!');
+                return;
+            }
+
+            showImagePopup({ title, imageUrl, altText, buttonText, buttonLink, size, position, oncePerSession, duration });
         }
 
         function showPopup(data) {
@@ -5993,6 +6297,140 @@
             overlay.classList.add('hidden');
         }
 
+        // Show image popup with advanced features
+        function showImagePopup(data) {
+            const overlay = document.getElementById('imagePopupOverlay');
+            const container = document.getElementById('imagePopupContainer');
+            const content = document.getElementById('imagePopupContent');
+            const titleEl = document.getElementById('imagePopupTitleEl');
+            const imageEl = document.getElementById('imagePopupImage');
+            const loadingEl = document.getElementById('imagePopupLoading');
+            const errorEl = document.getElementById('imagePopupError');
+            const ctaWrap = document.getElementById('imagePopupCtaContainer');
+            const cta = document.getElementById('imagePopupCta');
+            const ctaText = document.getElementById('imagePopupCtaText');
+            const dontShow = document.getElementById('dontShowImageAgain');
+
+            if (!overlay || !titleEl || !imageEl) return;
+
+            // Set title
+            titleEl.textContent = data.title || 'Iklan Kampus';
+
+            // Set size and position
+            applyImagePopupSizing(content, container, data.size, data.position);
+
+            // Setup CTA button
+            if (data.buttonText && data.buttonLink) {
+                ctaWrap.classList.remove('hidden');
+                ctaText.textContent = data.buttonText;
+                cta.onclick = (e) => {
+                    e.preventDefault();
+                    window.open(data.buttonLink, '_blank');
+                };
+            } else {
+                ctaWrap.classList.add('hidden');
+            }
+
+            // Reset states
+            dontShow.checked = false;
+            loadingEl.classList.remove('hidden');
+            errorEl.classList.add('hidden');
+            imageEl.style.display = 'none';
+
+            // Load image
+            const tempImg = new Image();
+            tempImg.onload = function() {
+                imageEl.src = data.imageUrl;
+                imageEl.alt = data.altText || data.title || 'Popup Image';
+                imageEl.style.display = 'block';
+                loadingEl.classList.add('hidden');
+            };
+            tempImg.onerror = function() {
+                loadingEl.classList.add('hidden');
+                errorEl.classList.remove('hidden');
+            };
+            tempImg.src = data.imageUrl;
+
+            // Show overlay
+            overlay.classList.remove('hidden');
+
+            // Auto close if duration is set
+            if (data.duration && data.duration > 0) {
+                setTimeout(() => {
+                    if (!overlay.classList.contains('hidden')) {
+                        closeImagePopup();
+                    }
+                }, data.duration * 1000);
+            }
+        }
+
+        // Apply sizing and positioning for image popup
+        function applyImagePopupSizing(content, container, size, position) {
+            // Reset classes
+            content.className = 'bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl w-full mx-auto relative';
+            container.className = 'relative z-[71] flex items-center justify-center min-h-screen p-4';
+
+            // Apply size
+            switch(size) {
+                case 'small':
+                    content.style.maxWidth = '400px';
+                    break;
+                case 'medium':
+                    content.style.maxWidth = '600px';
+                    break;
+                case 'large':
+                    content.style.maxWidth = '800px';
+                    break;
+                case 'fullscreen':
+                    content.style.maxWidth = '95vw';
+                    content.style.maxHeight = '95vh';
+                    break;
+                default:
+                    content.style.maxWidth = '600px';
+            }
+
+            // Apply position
+            switch(position) {
+                case 'top':
+                    container.classList.remove('items-center');
+                    container.classList.add('items-start', 'pt-20');
+                    break;
+                case 'bottom':
+                    container.classList.remove('items-center');
+                    container.classList.add('items-end', 'pb-20');
+                    break;
+                case 'center':
+                default:
+                    container.classList.remove('items-start', 'items-end', 'pt-20', 'pb-20');
+                    container.classList.add('items-center');
+                    break;
+            }
+        }
+
+        // Handle image loading error
+        function handleImageError(img) {
+            const loadingEl = document.getElementById('imagePopupLoading');
+            const errorEl = document.getElementById('imagePopupError');
+            
+            if (loadingEl) loadingEl.classList.add('hidden');
+            if (errorEl) errorEl.classList.remove('hidden');
+            img.style.display = 'none';
+        }
+
+        // Close image popup
+        function closeImagePopup() {
+            const overlay = document.getElementById('imagePopupOverlay');
+            if (!overlay) return;
+            
+            // Save session preference if checked
+            const dontShow = document.getElementById('dontShowImageAgain');
+            if (dontShow?.checked) {
+                sessionStorage.setItem('dashboardImagePopupSeen', '1');
+            }
+            
+            overlay.classList.add('hidden');
+        }
+
         async function maybeShowDashboardPopup() {
             // Tampilkan popup hanya di halaman dashboard
             const isDashboardVisible = !document.getElementById('dashboard')?.classList.contains('hidden');
@@ -6000,21 +6438,35 @@
 
             // Muat pengaturan jika belum ada
             if (!popupSettings) await loadPopupSettings();
+            if (!imagePopupSettings) await loadImagePopupSettings();
 
-            if (!popupSettings?.active) return;
+            // Show text popup if active
+            if (popupSettings?.active) {
+                // Periksa preferensi sesi
+                if (!popupSettings.oncePerSession || sessionStorage.getItem('dashboardPopupSeen') !== '1') {
+                    const delay = Math.max(0, parseInt(popupSettings.delay || 0, 10));
+                    setTimeout(() => {
+                        showPopup(popupSettings);
+                    }, delay * 1000);
+                }
+            }
 
-            // Periksa preferensi sesi
-            if (popupSettings.oncePerSession && sessionStorage.getItem('dashboardPopupSeen') === '1') return;
-
-            const delay = Math.max(0, parseInt(popupSettings.delay || 0, 10));
-            setTimeout(() => {
-                showPopup(popupSettings);
-            }, delay * 1000);
+            // Show image popup if active
+            if (imagePopupSettings?.active && imagePopupSettings?.imageUrl) {
+                // Periksa preferensi sesi
+                if (!imagePopupSettings.oncePerSession || sessionStorage.getItem('dashboardImagePopupSeen') !== '1') {
+                    const delay = Math.max(0, parseInt(imagePopupSettings.delay || 2, 10));
+                    setTimeout(() => {
+                        showImagePopup(imagePopupSettings);
+                    }, delay * 1000);
+                }
+            }
         }
 
         // Pastikan popup form terisi saat Prodi login
         function ensurePopupFormFilled() {
             fillPopupForm();
+            fillImagePopupForm();
         }
 
         // Initialize page - Firebase exclusive
@@ -6049,10 +6501,12 @@
             loadData().then(async () => {
                 // Muat pengaturan popup lalu tampilkan jika perlu di Dashboard
                 await loadPopupSettings();
+                await loadImagePopupSettings();
                 fillPopupForm();
+                fillImagePopupForm();
                 maybeShowDashboardPopup();
             });
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98ab583b35f512b0',t:'MTc1OTgxODU3Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98b1ada9007c62dc',t:'MTc1OTg4NDk4Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
